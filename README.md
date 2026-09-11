@@ -15,6 +15,9 @@ dotfiles/
 ├── sdkman/    # 프로젝트별 SDKMAN 설정 (.sdkmanrc)
 │   ├── work/      # 회사 프로젝트
 │   └── personal/  # 개인 프로젝트
+├── setup/     # 새 머신 초기 세팅용 인스톨러 스크립트 (.sh)
+│   ├── macos/     # macOS 전용
+│   └── linux/     # Linux 전용
 └── shell/     # 셸 설정 (.zshrc, .bashrc, aliases 등)
 ```
 
@@ -48,6 +51,16 @@ cd ~/work/<project> && sdk env
 
 > ⚠️ 버전 정보(`java=21.0.4-tem` 등)처럼 민감하지 않은 설정만 커밋합니다.
 > 사내 저장소 URL, 토큰, 계정 정보 등은 절대 포함하지 마세요.
+
+### Setup
+
+새 머신의 초기 세팅을 진행하는 인스톨러 위저드 스크립트를 OS별로 `setup/<macos|linux>/` 에 보관합니다.
+
+```bash
+# 예시: macOS
+git clone <this-repo> ~/dotfiles
+bash ~/dotfiles/setup/macos/<script>.sh
+```
 
 ## License
 
