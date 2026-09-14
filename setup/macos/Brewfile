@@ -1,0 +1,44 @@
+# Brewfile - macOS 초기 세팅용 CLI 패키지 목록
+#
+# install.sh 의 'brewfile' 항목이 이 파일을 사용합니다.
+# Ghostty, fnm 등은 install.sh 가 개별 항목으로 설치하므로 여기에 넣지 않습니다.
+#
+#   brew bundle --file setup/macos/Brewfile          # 설치
+#   brew bundle check --file setup/macos/Brewfile    # 설치 여부 확인
+#   brew bundle dump --file setup/macos/Brewfile     # 현재 머신 상태로 덮어쓰기
+
+tap "homebrew/bundle"
+
+# --- 기본 ---
+brew "git"
+brew "gh"
+brew "curl"
+brew "wget"
+brew "jq"
+brew "tree"
+
+# --- 검색 / 탐색 ---
+brew "ripgrep"
+brew "fd"
+brew "fzf"
+brew "bat"
+brew "eza"
+brew "zoxide"
+
+# --- zsh ---
+brew "zsh-autosuggestions"
+brew "zsh-syntax-highlighting"
+
+# --- 애플리케이션 ---
+cask "cursor"
+cask "visual-studio-code"
+
+# --- 필요하면 주석 해제 ---
+# brew "starship"
+# brew "mise"
+# cask "rectangle"
+# cask "raycast"
+# cask "docker"
+# cask "intellij-idea"
+# cask "slack"
+# cask "notion"
