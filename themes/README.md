@@ -7,7 +7,7 @@
 
 ### nord
 
-[![MobaXterm](https://img.shields.io/badge/MobaXterm-download-4C566A?style=for-the-badge)](https://raw.githubusercontent.com/LIBRA-PARK/dotfiles/main/themes/nord/nord-themes.mxtcolors)
+[![MobaXterm](https://img.shields.io/badge/MobaXterm-download-4C566A?style=for-the-badge)](https://github.com/LIBRA-PARK/dotfiles/blob/main/themes/nord/nord-themes.mxtcolors)
 
 <!-- INDEX:END -->
 

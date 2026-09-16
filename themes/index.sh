@@ -81,10 +81,12 @@ badge_label() {
 }
 
 render_index() {
-  local slug branch base_raw
+  local slug branch base_blob
   slug="$(repo_slug)" || die "git remote 'origin' 을 찾지 못했습니다."
   branch="$(repo_branch)"
-  base_raw="https://raw.githubusercontent.com/$slug/$branch/themes"
+  # raw 는 텍스트에 text/plain 을 붙여 브라우저가 표시만 한다.
+  # blob 페이지에는 "Download raw file" 버튼이 있어 실제로 파일로 받힌다.
+  base_blob="https://github.com/$slug/blob/$branch/themes"
 
   local theme_dir theme file name app count line badge any_theme=false
 
@@ -104,7 +106,7 @@ render_index() {
       name="$(basename "$file")"
       app="$(app_for_file "$name")" || continue
       badge="$(printf '[![%s](https://img.shields.io/badge/%s-download-4C566A?style=for-the-badge)](%s/%s/%s)' \
-        "$app" "$(badge_label "$app")" "$base_raw" "$theme" "$name")"
+        "$app" "$(badge_label "$app")" "$base_blob" "$theme" "$name")"
       if [[ -z "$line" ]]; then line="$badge"; else line="$line $badge"; fi
       count=$((count + 1))
     done

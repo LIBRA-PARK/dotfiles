@@ -3,6 +3,9 @@
 *.otf binary
 
 # MobaXterm 은 Windows 프로그램이라 CRLF 를 유지해야 한다.
-# binary(= -text -diff): 개행 변환을 막고, raw 가 octet-stream 으로 내려보내
-# 브라우저에서 바로 다운로드되게 한다.
-*.mxtcolors binary
+# -text: 어느 OS 에서 clone/commit 하든 개행을 변환하지 않는다. diff 는 계속 보인다.
+#
+# binary 로 표시해도 raw.githubusercontent.com 의 Content-Type 은 바뀌지 않는다.
+# (측정 결과 text/plain 유지) raw 는 gitattributes 가 아니라 내용을 보고 판정하므로,
+# 다운로드를 강제할 목적으로 binary 를 쓸 이유가 없다.
+*.mxtcolors -text
