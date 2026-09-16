@@ -1,0 +1,112 @@
+# Ghostty 설정
+# 설치 위치: ~/.config/ghostty/config (setup/macos/install.sh 의 dotfiles 항목이 심볼릭 링크)
+# 전체 옵션: ghostty +show-config --default --docs
+# 공식 문서: https://ghostty.org/docs/config/reference
+# 설정 리로드: cmd+shift+, (재시작 없이 적용. background-opacity 등 일부는 재시작 필요)
+
+# ── 테마 ─────────────────────────────────────────────────────────
+# Ghostty 내장 Nord 테마 (목록 확인: ghostty +list-themes)
+# 라이트/다크 자동 전환을 원하면: theme = light:rose-pine-dawn,dark:Nord
+theme = Nord
+
+# ── 폰트 ─────────────────────────────────────────────────────────
+# 목록 확인: ghostty +list-fonts
+# font-family 를 여러 줄 쓰면 위에서부터 fallback 체인이 된다.
+# 레포 폰트 정책(font/fonts.conf, font/install.sh)과 동일한 체인을 쓴다.
+# 1순위: JetBrainsMono Nerd Font      (영문 + Nerd 아이콘, 한글 없음)
+# 2순위: D2KodingLigature Nerd Font   (한글 + Nerd 아이콘)
+# 설치: bash font/install.sh
+font-family = JetBrainsMono Nerd Font
+font-family = D2KodingLigature Nerd Font
+font-style = Regular
+font-size = 13
+
+# 리거처(->, => 등 합자)를 끄려면 주석 해제
+# font-feature = -calt, -liga, -dlig
+
+# 줄 간격 여유 (셀 높이 10% 증가)
+adjust-cell-height = 10%
+
+# ── 창 ───────────────────────────────────────────────────────────
+# 신규 창 크기 (셀 단위. 0 = 시스템 기본값)
+window-height = 42
+window-width = 160
+
+# 내부 여백 (포인트 단위)
+window-padding-x = 10
+window-padding-y = 8
+# 창 크기가 셀 배수로 안 떨어질 때 남는 여백을 양쪽에 균등 배분
+window-padding-balance = true
+
+# 종료 시 창 배치를 저장했다가 다음 실행에 복원 (default | never | always)
+window-save-state = always
+
+# 크기 조절 중 뜨는 셀 크기 오버레이 (always | never | after-first)
+resize-overlay = never
+
+# ── 배경 ─────────────────────────────────────────────────────────
+# 반투명 배경. 값 변경 후에는 Ghostty 완전 재시작 필요 (macOS)
+background-opacity = 0.96
+# 배경 블러 강도 (true/false 또는 0~100 정수)
+background-blur = 20
+
+# ── 커서 ─────────────────────────────────────────────────────────
+# block | bar | underline | block_hollow
+cursor-style = block
+# 깜빡임. 비워 두면 프로그램(DEC Mode 12)이 제어
+cursor-style-blink = false
+
+# ── 마우스 / 선택 ────────────────────────────────────────────────
+# 타이핑 중 마우스 포인터 숨김
+mouse-hide-while-typing = true
+# 드래그 선택만으로 클립보드 복사 (기본 true)
+copy-on-select = true
+
+# ── 클립보드 ─────────────────────────────────────────────────────
+# 앱의 클립보드 읽기 요청 처리 (ask | allow | deny)
+clipboard-read = ask
+clipboard-write = allow
+# 개행이 섞인 붙여넣기는 확인 창을 띄움 (실수로 명령 실행되는 것 방지)
+clipboard-paste-protection = true
+
+# ── 스크롤백 ─────────────────────────────────────────────────────
+# 터미널 하나당 스크롤백 상한 (바이트). 기본 10MB
+scrollback-limit = 10000000
+
+# ── 셸 통합 ──────────────────────────────────────────────────────
+# zsh/bash/fish 자동 감지해 OSC 133 프롬프트 마킹 등을 주입
+shell-integration = detect
+# cursor: 프롬프트별 커서 모양 / sudo: sudo 에 terminfo 전달 / title: 창 제목 자동 갱신
+shell-integration-features = cursor,sudo,title
+
+# ── macOS ────────────────────────────────────────────────────────
+# Option 키를 Alt(Meta)로 사용 (true | false | left | right)
+# 한글 자판에서 Option 조합 입력이 필요하면 false 로
+macos-option-as-alt = true
+# 타이틀바 스타일 (native | transparent | tabs | hidden)
+macos-titlebar-style = transparent
+
+# ── 동작 ─────────────────────────────────────────────────────────
+# 실행 중인 프로세스가 있을 때만 종료 확인
+confirm-close-surface = true
+# 마지막 창을 닫아도 앱은 Dock 에 남김
+quit-after-last-window-closed = false
+# 비활성 분할 화면을 살짝 어둡게 (0.15 ~ 1.0)
+unfocused-split-opacity = 0.85
+
+# ── 키 바인딩 ────────────────────────────────────────────────────
+# 액션 목록: ghostty +list-actions
+# macOS 기본 단축키(탭/창/복사 등)는 그대로 두고 분할 관련만 보강한다
+keybind = cmd+d=new_split:right
+keybind = cmd+shift+d=new_split:down
+keybind = cmd+shift+enter=toggle_split_zoom
+keybind = cmd+alt+left=goto_split:left
+keybind = cmd+alt+right=goto_split:right
+keybind = cmd+alt+up=goto_split:up
+keybind = cmd+alt+down=goto_split:down
+keybind = cmd+k=clear_screen
+
+# ── 로컬 오버라이드 ──────────────────────────────────────────────
+# 머신별 설정(폰트 크기, 테마 등)은 아래 파일에 두고 git 에는 올리지 않는다.
+# 파일이 없어도 오류가 나지 않도록 ? 접두사를 붙인다.
+config-file = ?~/.config/ghostty/config.local
