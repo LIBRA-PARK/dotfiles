@@ -1,13 +1,15 @@
 # Themes
 
-앱별 설정 파일을 테마 이름으로 묶어 둔 곳입니다.
-버튼을 누르면 해당 파일로 바로 이동합니다.
+파일은 `themes/<테마>/<앱>` 으로 두고, 아래 표에서 앱 기준으로 찾습니다.
+빈 칸이 아직 만들지 않은 조합입니다.
 
 <!-- INDEX:START -->
 
-### nord
+| 앱 | nord |
+| --- | :---: |
+| MobaXterm | [✓](https://github.com/LIBRA-PARK/dotfiles/blob/main/themes/nord/nord-themes.mxtcolors) |
 
-[![MobaXterm](https://img.shields.io/badge/MobaXterm-4C566A?style=for-the-badge)](https://github.com/LIBRA-PARK/dotfiles/blob/main/themes/nord/nord-themes.mxtcolors)
+✓ 를 누르면 해당 파일로 이동합니다. — 는 아직 없는 조합입니다.
 
 <!-- INDEX:END -->
 

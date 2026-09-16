@@ -72,14 +72,40 @@ app_for_file() {
 
 # ------------------------------------------------------------------ 생성 --
 
-# shields.io 배지 라벨용 이스케이프. '-' 는 '--', 공백은 '_' 로 바꾼다.
-badge_label() {
-  local t="$1"
-  t="${t//-/--}"
-  t="${t// /_}"
-  printf '%s\n' "$t"
+# 모든 테마에서 발견된 앱 이름을 중복 없이 정렬해 출력한다.
+# 이 목록이 표의 행이 된다.
+all_apps() {
+  local theme_dir file
+  {
+    for theme_dir in "$THEMES_DIR"/*/; do
+      [[ -d "$theme_dir" ]] || continue
+      for file in "$theme_dir"*; do
+        [[ -f "$file" ]] || continue
+        app_for_file "$(basename "$file")" || continue
+      done
+    done
+  } | sort -u
 }
 
+# file_for_app <테마 디렉토리> <앱 이름>
+# 해당 앱의 파일명을 출력한다. 없으면 1 을 반환한다.
+file_for_app() {
+  local theme_dir="$1" want="$2" file name app
+  for file in "$theme_dir"*; do
+    [[ -f "$file" ]] || continue
+    name="$(basename "$file")"
+    app="$(app_for_file "$name")" || continue
+    if [[ "$app" == "$want" ]]; then
+      printf '%s\n' "$name"
+      return 0
+    fi
+  done
+  return 1
+}
+
+# 앱(행) x 테마(열) 행렬을 그린다.
+# 빈 칸이 곧 "그 앱에 그 테마가 없다" 는 뜻이라 누락이 바로 보인다.
+# 테마 디렉토리 이름에는 공백을 쓰지 않는다 (아래 단어 분리에 의존).
 render_index() {
   local slug branch base_blob
   slug="$(repo_slug)" || die "git remote 'origin' 을 찾지 못했습니다."
@@ -91,38 +117,49 @@ render_index() {
   # 브라우저가 내려받지 않고 내용을 표시만 한다. (측정으로 확인)
   base_blob="https://github.com/$slug/blob/$branch/themes"
 
-  local theme_dir theme file name app count line badge any_theme=false
+  local themes="" theme_dir theme apps app name
 
   for theme_dir in "$THEMES_DIR"/*/; do
     [[ -d "$theme_dir" ]] || continue
-    theme="$(basename "$theme_dir")"
-    any_theme=true
-
-    printf '### %s\n\n' "$theme"
-
-    # 배지 하나가 앱 하나의 설정 파일 링크가 된다. 라벨은 앱 이름.
-    # GitHub 의 개행 처리에 상관없이 가로로 늘어서도록 한 줄에 모은다.
-    count=0
-    line=""
-    for file in "$theme_dir"*; do
-      [[ -f "$file" ]] || continue
-      name="$(basename "$file")"
-      app="$(app_for_file "$name")" || continue
-      badge="$(printf '[![%s](https://img.shields.io/badge/%s-4C566A?style=for-the-badge)](%s/%s/%s)' \
-        "$app" "$(badge_label "$app")" "$base_blob" "$theme" "$name")"
-      if [[ -z "$line" ]]; then line="$badge"; else line="$line $badge"; fi
-      count=$((count + 1))
-    done
-
-    if ((count == 0)); then
-      printf '_아직 설정 파일이 없습니다._\n'
-    else
-      printf '%s\n' "$line"
-    fi
-    printf '\n'
+    themes="$themes $(basename "$theme_dir")"
   done
+  themes="${themes# }"
 
-  $any_theme || printf '_아직 테마가 없습니다._\n'
+  if [[ -z "$themes" ]]; then
+    printf '_아직 테마가 없습니다._\n'
+    return 0
+  fi
+
+  apps="$(all_apps)"
+  if [[ -z "$apps" ]]; then
+    printf '_아직 설정 파일이 없습니다._\n'
+    return 0
+  fi
+
+  # 헤더
+  printf '| 앱 |'
+  for theme in $themes; do printf ' %s |' "$theme"; done
+  printf '\n| --- |'
+  for theme in $themes; do printf ' :---: |'; done
+  printf '\n'
+
+  # 본문: 파일이 있으면 링크, 없으면 em dash
+  while IFS= read -r app; do
+    [[ -n "$app" ]] || continue
+    printf '| %s |' "$app"
+    for theme in $themes; do
+      if name="$(file_for_app "$THEMES_DIR/$theme/" "$app")"; then
+        printf ' [✓](%s/%s/%s) |' "$base_blob" "$theme" "$name"
+      else
+        printf ' — |'
+      fi
+    done
+    printf '\n'
+  done <<EOF
+$apps
+EOF
+
+  printf '\n✓ 를 누르면 해당 파일로 이동합니다. — 는 아직 없는 조합입니다.\n'
 }
 
 # ------------------------------------------------------------------ 반영 --
