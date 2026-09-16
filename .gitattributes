@@ -1,3 +1,7 @@
 # 폰트는 바이너리. git 이 diff 를 시도하거나 개행을 변환하지 않도록 명시한다.
 *.ttf binary
 *.otf binary
+
+# MobaXterm 은 Windows 프로그램이라 CRLF 를 유지해야 한다.
+# -text: 어느 OS 에서 clone/commit 하든 개행을 변환하지 않는다. diff 는 계속 보인다.
+*.mxtcolors -text
