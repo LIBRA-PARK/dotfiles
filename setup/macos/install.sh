@@ -81,6 +81,7 @@ ITEMS=(
   "herdr|Herdr|herdr.dev 설치 스크립트"
   "antigravity|Antigravity|Google Antigravity CLI"
   "sdkman|SDKMAN|JVM 툴체인 매니저"
+  "font|Fonts|JetBrainsMono + D2Coding (Nerd Font 아이콘 포함)"
   "dotfiles|dotfiles 링크|이 저장소의 설정 파일을 홈에 심볼릭 링크"
   "shell|기본 셸을 zsh 로|chsh 로 로그인 셸 변경"
   "macos|macOS 기본 설정|키 반복 속도, Finder, Dock, 스크린샷 위치"
@@ -117,6 +118,7 @@ item_installed() {
     herdr)       has herdr ;;
     antigravity) has antigravity ;;
     sdkman)      [[ -d "$HOME/.sdkman" ]] ;;
+    font)        [[ -e "$HOME/Library/Fonts/JetBrainsMonoNerdFont-Regular.ttf" ]] ;;
     *)           return 1 ;;
   esac
 }
@@ -443,6 +445,23 @@ install_sdkman() {
   ok "설치 완료 (새 셸에서 'sdk version' 으로 확인)"
 }
 
+# 폰트는 macOS/Linux 공용이라 font/install.sh 에 로직을 두고 여기서는 위임만 한다.
+install_font() {
+  local script="$DOTFILES_DIR/font/install.sh"
+
+  if [[ ! -f "$script" ]]; then
+    warn "font/install.sh 가 없습니다: $script"
+    return 1
+  fi
+
+  # 하위 스크립트가 자체적으로 진행 상황을 출력한다.
+  if $DRY_RUN; then
+    bash "$script" --dry-run || return 1
+  else
+    bash "$script" || return 1
+  fi
+}
+
 install_dotfiles() {
   local app_support="$HOME/Library/Application Support"
 
@@ -548,6 +567,7 @@ install_item() {
     herdr)       install_herdr ;;
     antigravity) install_antigravity ;;
     sdkman)      install_sdkman ;;
+    font)        install_font ;;
     dotfiles)    install_dotfiles ;;
     shell)       install_shell ;;
     macos)       install_macos ;;

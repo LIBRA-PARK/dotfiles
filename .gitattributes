@@ -1,0 +1,3 @@
+# 폰트는 바이너리. git 이 diff 를 시도하거나 개행을 변환하지 않도록 명시한다.
+*.ttf binary
+*.otf binary
