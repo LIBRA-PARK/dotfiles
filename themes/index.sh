@@ -7,7 +7,7 @@
 #   bash themes/index.sh --check    # 갱신이 필요한지만 확인 (종료코드 1이면 필요)
 #
 # 테마를 추가하거나 파일을 넣은 뒤 이 스크립트를 돌리면 README 의
-# 보기/내려받기 링크가 자동으로 맞춰진다.
+# 파일 링크가 자동으로 맞춰진다.
 #
 # macOS 기본 bash 3.2 에서 동작하도록 연관배열/mapfile 등은 쓰지 않는다.
 
@@ -84,8 +84,11 @@ render_index() {
   local slug branch base_blob
   slug="$(repo_slug)" || die "git remote 'origin' 을 찾지 못했습니다."
   branch="$(repo_branch)"
-  # raw 는 텍스트에 text/plain 을 붙여 브라우저가 표시만 한다.
-  # blob 페이지에는 "Download raw file" 버튼이 있어 실제로 파일로 받힌다.
+  # 파일 페이지(blob)로 보낸다. 내용을 바로 볼 수 있고, 필요하면
+  # 그 페이지의 "Download raw file" 버튼으로 받을 수도 있다.
+  #
+  # raw 직링크는 쓰지 않는다. GitHub 은 텍스트 파일에 text/plain 을 붙이므로
+  # 브라우저가 내려받지 않고 내용을 표시만 한다. (측정으로 확인)
   base_blob="https://github.com/$slug/blob/$branch/themes"
 
   local theme_dir theme file name app count line badge any_theme=false
@@ -97,7 +100,7 @@ render_index() {
 
     printf '### %s\n\n' "$theme"
 
-    # 배지 하나가 앱 하나의 다운로드 버튼이 된다.
+    # 배지 하나가 앱 하나의 설정 파일 링크가 된다. 라벨은 앱 이름.
     # GitHub 의 개행 처리에 상관없이 가로로 늘어서도록 한 줄에 모은다.
     count=0
     line=""
@@ -105,7 +108,7 @@ render_index() {
       [[ -f "$file" ]] || continue
       name="$(basename "$file")"
       app="$(app_for_file "$name")" || continue
-      badge="$(printf '[![%s](https://img.shields.io/badge/%s-download-4C566A?style=for-the-badge)](%s/%s/%s)' \
+      badge="$(printf '[![%s](https://img.shields.io/badge/%s-4C566A?style=for-the-badge)](%s/%s/%s)' \
         "$app" "$(badge_label "$app")" "$base_blob" "$theme" "$name")"
       if [[ -z "$line" ]]; then line="$badge"; else line="$line $badge"; fi
       count=$((count + 1))
