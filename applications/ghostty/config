@@ -1,5 +1,5 @@
 # Ghostty 설정
-# 설치 위치: ~/.config/ghostty/config (setup/macos/install.sh 의 dotfiles 항목이 심볼릭 링크)
+# 설치 위치: ~/.config/ghostty/config (scripts/macos/setup.sh 의 dotfiles 항목이 심볼릭 링크)
 # 전체 옵션: ghostty +show-config --default --docs
 # 공식 문서: https://ghostty.org/docs/config/reference
 # 설정 리로드: cmd+shift+, (재시작 없이 적용. background-opacity 등 일부는 재시작 필요)
@@ -8,17 +8,17 @@
 # Ghostty 내장 Nord 테마 (목록 확인: ghostty +list-themes)
 # 라이트/다크 자동 전환을 원하면: theme = light:rose-pine-dawn,dark:Nord
 theme = Nord
-# themes/setting.sh 로 고른 테마가 있으면 위 기본값을 덮어쓴다 (없으면 무시)
+# 테마 적용 스크립트로 고른 테마가 있으면 위 기본값을 덮어쓴다 (없으면 무시)
 # config-file 은 본 파일을 다 읽은 뒤 처리되므로 위치와 관계없이 우선한다.
 config-file = ?~/.config/ghostty/theme.conf
 
 # ── 폰트 ─────────────────────────────────────────────────────────
 # 목록 확인: ghostty +list-fonts
 # font-family 를 여러 줄 쓰면 위에서부터 fallback 체인이 된다.
-# 레포 폰트 정책(font/fonts.conf, font/install.sh)과 동일한 체인을 쓴다.
+# 레포 폰트 정책(assets/fonts/fonts.conf, scripts/lib/font.sh)과 동일한 체인을 쓴다.
 # 1순위: JetBrainsMono Nerd Font      (영문 + Nerd 아이콘, 한글 없음)
 # 2순위: D2KodingLigature Nerd Font   (한글 + Nerd 아이콘)
-# 설치: bash font/install.sh
+# 설치: bash scripts/dotfiles.sh font
 font-family = JetBrainsMono Nerd Font
 font-family = D2KodingLigature Nerd Font
 font-style = Regular

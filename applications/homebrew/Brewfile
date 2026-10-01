@@ -1,11 +1,11 @@
 # Brewfile - macOS 초기 세팅용 CLI 패키지 목록
 #
-# install.sh 의 'brewfile' 항목이 이 파일을 사용합니다.
-# Ghostty, fnm 등은 install.sh 가 개별 항목으로 설치하므로 여기에 넣지 않습니다.
+# scripts/macos/setup.sh 의 'brewfile' 항목이 이 파일을 사용합니다.
+# Ghostty, fnm 등은 setup.sh 가 개별 항목으로 설치하므로 여기에 넣지 않습니다.
 #
-#   brew bundle --file setup/macos/Brewfile          # 설치
-#   brew bundle check --file setup/macos/Brewfile    # 설치 여부 확인
-#   brew bundle dump --file setup/macos/Brewfile     # 현재 머신 상태로 덮어쓰기
+#   brew bundle --file applications/homebrew/Brewfile          # 설치
+#   brew bundle check --file applications/homebrew/Brewfile    # 설치 여부 확인
+#   brew bundle dump --file applications/homebrew/Brewfile     # 현재 머신 상태로 덮어쓰기
 
 tap "homebrew/bundle"
 

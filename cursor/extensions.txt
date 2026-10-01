@@ -1,3 +1,0 @@
-# Cursor 확장 목록 (setup/macos/install.sh 의 dotfiles 항목이 한 줄씩 설치)
-# 현재 설치 목록 갱신: cursor --list-extensions > cursor/extensions.txt
-arcticicestudio.nord-visual-studio-code

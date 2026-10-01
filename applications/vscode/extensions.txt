@@ -1,0 +1,3 @@
+# VS Code 확장 목록 (scripts/macos/setup.sh 의 dotfiles 항목이 한 줄씩 설치)
+# 현재 설치 목록 갱신: code --list-extensions > applications/vscode/extensions.txt
+arcticicestudio.nord-visual-studio-code

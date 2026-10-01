@@ -1,7 +1,7 @@
 #!/bin/bash
 # Claude Code statusLine — Nerd Font 아이콘 기반 한 줄 상태바
 # 표시: 디렉터리 · git 브랜치 · 모델 · 컨텍스트 바 · 세션 시간 · (사용 한도)
-# 폰트: JetBrainsMono Nerd Font (font/install.sh 로 설치)
+# 폰트: JetBrainsMono Nerd Font (bash scripts/dotfiles.sh font 로 설치)
 
 input=$(cat)
 
