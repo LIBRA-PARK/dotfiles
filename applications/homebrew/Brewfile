@@ -15,6 +15,7 @@ brew "gh"
 brew "curl"
 brew "wget"
 brew "jq"
+brew "gum"          # scripts/ TUI (없으면 기본 TUI 로 동작)
 brew "tree"
 
 # --- 검색 / 탐색 ---
