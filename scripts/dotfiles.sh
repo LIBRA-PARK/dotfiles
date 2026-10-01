@@ -5,6 +5,7 @@
 #   bash scripts/dotfiles.sh                     # 메뉴에서 작업 선택
 #   bash scripts/dotfiles.sh setup [옵션]        # OS 별 초기 세팅 (scripts/<os>/setup.sh)
 #   bash scripts/dotfiles.sh font [옵션]         # 폰트 설치/확인 (scripts/lib/font.sh)
+#   bash scripts/dotfiles.sh theme [테마] [옵션] # 테마 적용 (scripts/lib/theme.sh)
 #   bash scripts/dotfiles.sh themes-index [옵션] # themes/README.md 인덱스 갱신
 #
 # 옵션은 하위 스크립트에 그대로 넘긴다. 예) dotfiles.sh setup --dry-run
@@ -35,6 +36,7 @@ script_for() {
       os="$(os_dir)" || return 1
       printf '%s\n' "$SCRIPTS_DIR/$os/setup.sh" ;;
     font)         printf '%s\n' "$SCRIPTS_DIR/lib/font.sh" ;;
+    theme)        printf '%s\n' "$SCRIPTS_DIR/lib/theme.sh" ;;
     themes-index) printf '%s\n' "$SCRIPTS_DIR/lib/themes-index.sh" ;;
     *)            return 1 ;;
   esac
@@ -61,6 +63,8 @@ MENU=(
   "초기 세팅 미리보기 (dry-run)|setup|--dry-run"
   "폰트 설치|font|"
   "폰트 설치 상태|font|--list"
+  "테마 적용|theme|"
+  "테마 지원 현황|theme|--list"
   "테마 인덱스 갱신|themes-index|"
 )
 MENU_QUIT="종료"
@@ -93,7 +97,7 @@ run_menu() {
 
 main() {
   case "${1:-}" in
-    -h|--help) usage_from "${BASH_SOURCE[0]}" 13; exit 0 ;;
+    -h|--help) usage_from "${BASH_SOURCE[0]}" 14; exit 0 ;;
     "")
       if [[ -t 1 ]] && (exec 3</dev/tty) 2>/dev/null; then
         run_menu
