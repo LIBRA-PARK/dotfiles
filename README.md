@@ -25,7 +25,7 @@ dotfiles/
 ├── themes/         # 앱별 테마 값 (themes/README.md 참고)
 └── scripts/        # 실행 스크립트
     ├── dotfiles.sh   # 단일 진입점 (TUI 메뉴)
-    ├── lib/          # 공용 헬퍼(common.sh), TUI(ui.sh), OS 무관 작업 (font.sh, themes-index.sh)
+    ├── lib/          # 공용 헬퍼(common.sh), TUI(ui.sh), OS 무관 작업 (font, theme, themes-index)
     ├── macos/        # macOS 초기 세팅 (setup.sh)
     └── linux/        # Linux 초기 세팅 (예정)
 ```
@@ -39,6 +39,7 @@ git clone git@github.com:LIBRA-PARK/dotfiles.git ~/dotfiles
 bash ~/dotfiles/scripts/dotfiles.sh                  # TUI 메뉴
 bash ~/dotfiles/scripts/dotfiles.sh setup [옵션]     # OS 별 초기 세팅
 bash ~/dotfiles/scripts/dotfiles.sh font [옵션]      # 폰트 설치/확인
+bash ~/dotfiles/scripts/dotfiles.sh theme [테마]     # 테마 적용 (themes/README.md 참고)
 bash ~/dotfiles/scripts/dotfiles.sh themes-index     # themes/README.md 인덱스 갱신
 ```
 
