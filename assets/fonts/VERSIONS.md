@@ -83,11 +83,11 @@ done
 unzip -o -j JetBrainsMono.zip \
   'JetBrainsMonoNerdFont-Regular.ttf' 'JetBrainsMonoNerdFont-Bold.ttf' \
   'JetBrainsMonoNerdFont-Italic.ttf'  'JetBrainsMonoNerdFont-BoldItalic.ttf' \
-  'OFL.txt' -d ~/dotfiles/font/jetbrains-mono
+  'OFL.txt' -d ~/dotfiles/assets/fonts/jetbrains-mono
 
 unzip -o -j D2Coding.zip \
   'D2KodingLigatureNerdFont-Regular.ttf' 'D2KodingLigatureNerdFont-Bold.ttf' \
-  'OFL.txt' -d ~/dotfiles/font/d2coding
+  'OFL.txt' -d ~/dotfiles/assets/fonts/d2coding
 
 cd ~/dotfiles/font
 sha256sum jetbrains-mono/*.ttf d2coding/*.ttf > SHA256SUMS   # VERSIONS.md 표도 갱신
@@ -98,5 +98,5 @@ bash install.sh                            # 링크는 그대로, 캐시만 갱�
 아래 앱별 설정도 같이 고쳐야 합니다.
 
 ```bash
-fc-scan --format '%{family}\n' ~/dotfiles/font/*/*.ttf | sort -u
+fc-scan --format '%{family}\n' ~/dotfiles/assets/fonts/*/*.ttf | sort -u
 ```
