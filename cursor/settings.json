@@ -1,0 +1,33 @@
+{
+  // Cursor 설정 (VS Code 와 같은 settings.json 형식. 주석 사용 가능)
+  // 설치 위치: ~/Library/Application Support/Cursor/User/settings.json
+  //   (setup/macos/install.sh 의 dotfiles 항목이 심볼릭 링크)
+  // 설정 변경은 저장 즉시 적용된다.
+
+  // ── 테마 ───────────────────────────────────────────────────────
+  // Ghostty 와 같은 Nord 테마. 확장 설치가 필요하다: cursor/extensions.txt
+  // (arcticicestudio.nord-visual-studio-code)
+  // 라이트/다크 자동 전환을 원하면 아래 두 줄과 함께 preferredDark/LightColorTheme 을 지정:
+  //   "window.autoDetectColorScheme": true,
+  "workbench.colorTheme": "Nord",
+
+  // ── 폰트 ───────────────────────────────────────────────────────
+  // 레포 폰트 정책(font/fonts.conf, font/install.sh)과 동일한 fallback 체인을 쓴다.
+  // 1순위: JetBrainsMono Nerd Font      (영문 + Nerd 아이콘, 한글 없음)
+  // 2순위: D2KodingLigature Nerd Font   (한글 + Nerd 아이콘)
+  // 설치: bash font/install.sh
+  "editor.fontFamily": "'JetBrainsMono Nerd Font', 'D2KodingLigature Nerd Font', monospace",
+  "editor.fontSize": 13,
+  // 리거처(->, => 등 합자). 끄려면 false
+  "editor.fontLigatures": true,
+  "terminal.integrated.fontFamily": "'JetBrainsMono Nerd Font', 'D2KodingLigature Nerd Font'",
+  "terminal.integrated.fontSize": 13,
+  "terminal.integrated.fontLigatures.enabled": true,
+
+  // ── 기존 설정 ──────────────────────────────────────────────────
+  "claudeCode.preferredLocation": "panel",
+  "git.autofetch": true,
+  "explorer.compactFolders": false,
+  "scm.compactFolders": false,
+  "notebook.compactView": false
+}
