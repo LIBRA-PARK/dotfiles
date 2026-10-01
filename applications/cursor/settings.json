@@ -29,5 +29,6 @@
   "git.autofetch": true,
   "explorer.compactFolders": false,
   "scm.compactFolders": false,
-  "notebook.compactView": false
+  "notebook.compactView": false,
+  "git.confirmSync": false
 }
