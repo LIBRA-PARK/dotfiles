@@ -2,56 +2,31 @@
 #
 # 폰트 설치 (macOS / Linux)
 #
-#   bash font/install.sh              # 홈 폰트 디렉토리로 심볼릭 링크
-#   bash font/install.sh --copy       # 링크 대신 복사 (링크를 못 읽는 앱이 있을 때)
-#   bash font/install.sh --dry-run    # 실제 변경 없이 실행 내용만 출력
-#   bash font/install.sh --list       # 레포의 폰트와 현재 설치 상태만 확인
-#   bash font/install.sh --uninstall  # 이 스크립트가 설치한 것만 제거
+#   bash scripts/lib/font.sh              # 홈 폰트 디렉토리로 심볼릭 링크
+#   bash scripts/lib/font.sh --copy       # 링크 대신 복사 (링크를 못 읽는 앱이 있을 때)
+#   bash scripts/lib/font.sh --dry-run    # 실제 변경 없이 실행 내용만 출력
+#   bash scripts/lib/font.sh --list       # 레포의 폰트와 현재 설치 상태만 확인
+#   bash scripts/lib/font.sh --uninstall  # 이 스크립트가 설치한 것만 제거
 #
 # 기본   : JetBrainsMono Nerd Font      (영문 + Nerd 아이콘)
 # fallback: D2KodingLigature Nerd Font  (한글 + Nerd 아이콘)
 #
-# 여러 번 실행해도 안전(idempotent)합니다.
+# 폰트 파일은 assets/fonts/ 에 있다. 여러 번 실행해도 안전(idempotent)합니다.
 # macOS 기본 bash 3.2 에서 동작하도록 연관배열/mapfile 등은 쓰지 않습니다.
 
 set -uo pipefail
 
-FONT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=common.sh
+source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
 
-DRY_RUN=false
+FONT_DIR="$ASSETS_DIR/fonts"
+
 LIST_ONLY=false
 UNINSTALL=false
 USE_COPY=false
 
 # fontconfig 설정이 링크될 이름. conf.d 는 파일명 순으로 읽히므로 숫자 접두사를 둔다.
 FONTCONF_NAME="10-dotfiles-fonts.conf"
-
-# ---------------------------------------------------------------- 출력 헬퍼 --
-
-if [[ -t 1 ]]; then
-  C_RESET=$'\033[0m'; C_BOLD=$'\033[1m'; C_DIM=$'\033[2m'
-  C_BLUE=$'\033[34m'; C_GREEN=$'\033[32m'; C_YELLOW=$'\033[33m'; C_RED=$'\033[31m'
-else
-  C_RESET=""; C_BOLD=""; C_DIM=""
-  C_BLUE=""; C_GREEN=""; C_YELLOW=""; C_RED=""
-fi
-
-step()  { printf '\n%s==> %s%s\n' "$C_BOLD$C_BLUE" "$*" "$C_RESET"; }
-info()  { printf '    %s\n' "$*"; }
-ok()    { printf '    %s✓%s %s\n' "$C_GREEN" "$C_RESET" "$*"; }
-skip()  { printf '    %s-%s %s\n' "$C_DIM" "$C_RESET" "$*"; }
-warn()  { printf '    %s!%s %s\n' "$C_YELLOW" "$C_RESET" "$*"; }
-die()   { printf '\n%s오류:%s %s\n' "$C_RED" "$C_RESET" "$*" >&2; exit 1; }
-
-has() { command -v "$1" >/dev/null 2>&1; }
-
-run() {
-  if $DRY_RUN; then
-    printf '    %s[dry-run]%s %s\n' "$C_DIM" "$C_RESET" "$*"
-  else
-    "$@"
-  fi
-}
 
 # ------------------------------------------------------------------ OS 판별 --
 
@@ -270,7 +245,7 @@ EOF
 
 # -------------------------------------------------------------------- main --
 
-usage() { sed -n '2,16p' "${BASH_SOURCE[0]}" | sed 's/^#\{0,1\} \{0,1\}//'; }
+usage() { usage_from "${BASH_SOURCE[0]}" 16; }
 
 main() {
   while (($#)); do

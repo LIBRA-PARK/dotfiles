@@ -2,9 +2,9 @@
 #
 # themes/README.md 의 인덱스 표를 디렉토리 구조에서 다시 생성한다.
 #
-#   bash themes/index.sh            # README.md 의 인덱스 구간을 갱신
-#   bash themes/index.sh --stdout   # 갱신하지 않고 표만 출력
-#   bash themes/index.sh --check    # 갱신이 필요한지만 확인 (종료코드 1이면 필요)
+#   bash scripts/lib/themes-index.sh            # README.md 의 인덱스 구간을 갱신
+#   bash scripts/lib/themes-index.sh --stdout   # 갱신하지 않고 표만 출력
+#   bash scripts/lib/themes-index.sh --check    # 갱신이 필요한지만 확인 (종료코드 1이면 필요)
 #
 # 구조: themes/<앱>/app.conf (적용 정보) + themes/<앱>/<테마>.<THEME_EXT>
 # 앱이나 테마 파일을 추가한 뒤 이 스크립트를 돌리면 README 의
@@ -14,7 +14,9 @@
 
 set -uo pipefail
 
-THEMES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=common.sh
+source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
+
 README="$THEMES_DIR/README.md"
 
 # 이 두 마커 사이만 교체한다. 나머지 문서는 손대지 않는다.
@@ -22,8 +24,6 @@ MARK_START="<!-- INDEX:START -->"
 MARK_END="<!-- INDEX:END -->"
 
 MODE="write"
-
-die() { printf 'oops: %s\n' "$*" >&2; exit 1; }
 
 # ------------------------------------------------------------- 저장소 정보 --
 
@@ -164,7 +164,7 @@ main() {
     case "$1" in
       --stdout) MODE="stdout" ;;
       --check)  MODE="check" ;;
-      -h|--help) sed -n '2,10p' "${BASH_SOURCE[0]}" | sed 's/^#\{0,1\} \{0,1\}//'; exit 0 ;;
+      -h|--help) usage_from "${BASH_SOURCE[0]}" 13; exit 0 ;;
       *) die "알 수 없는 옵션: $1" ;;
     esac
     shift
@@ -185,7 +185,7 @@ main() {
     if cmp -s "$tmp" "$README"; then
       rm -f "$tmp"; printf '인덱스가 최신입니다.\n'; exit 0
     fi
-    rm -f "$tmp"; printf '인덱스 갱신이 필요합니다. bash themes/index.sh 를 실행하세요.\n'; exit 1
+    rm -f "$tmp"; printf '인덱스 갱신이 필요합니다. bash scripts/lib/themes-index.sh 를 실행하세요.\n'; exit 1
   fi
 
   if cmp -s "$tmp" "$README"; then

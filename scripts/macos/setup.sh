@@ -2,55 +2,26 @@
 #
 # macOS 초기 세팅 인스톨러 (TUI)
 #
-#   bash setup/macos/install.sh                 # 체크리스트에서 골라 설치
-#   bash setup/macos/install.sh --all           # 전체 항목을 질문 없이 설치
-#   bash setup/macos/install.sh --only brew,node
-#   bash setup/macos/install.sh --dry-run       # 실제 변경 없이 실행 내용만 출력
-#   bash setup/macos/install.sh --list          # 설치 항목과 현재 상태만 확인
+#   bash scripts/macos/setup.sh                 # 체크리스트에서 골라 설치
+#   bash scripts/macos/setup.sh --all           # 전체 항목을 질문 없이 설치
+#   bash scripts/macos/setup.sh --only brew,node
+#   bash scripts/macos/setup.sh --dry-run       # 실제 변경 없이 실행 내용만 출력
+#   bash scripts/macos/setup.sh --list          # 설치 항목과 현재 상태만 확인
 #
 # 모든 항목은 여러 번 실행해도 안전(idempotent)합니다.
 # macOS 기본 bash 3.2 에서 동작하도록 연관배열/mapfile 등은 쓰지 않습니다.
 
 set -uo pipefail
 
-DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+# shellcheck source=../lib/common.sh
+source "$(dirname "${BASH_SOURCE[0]}")/../lib/common.sh"
+
 BACKUP_SUFFIX="bak.$(date +%Y%m%d%H%M%S)"
 BREW_PREFIX=""
 
 ASSUME_YES=false
-DRY_RUN=false
 LIST_ONLY=false
 ONLY_KEYS=""
-
-# ---------------------------------------------------------------- 출력 헬퍼 --
-
-if [[ -t 1 ]]; then
-  C_RESET=$'\033[0m'; C_BOLD=$'\033[1m'; C_DIM=$'\033[2m'; C_REV=$'\033[7m'
-  C_BLUE=$'\033[34m'; C_GREEN=$'\033[32m'; C_YELLOW=$'\033[33m'; C_RED=$'\033[31m'
-  C_CYAN=$'\033[36m'
-else
-  C_RESET=""; C_BOLD=""; C_DIM=""; C_REV=""
-  C_BLUE=""; C_GREEN=""; C_YELLOW=""; C_RED=""; C_CYAN=""
-fi
-
-step()  { printf '\n%s==> %s%s\n' "$C_BOLD$C_BLUE" "$*" "$C_RESET"; }
-info()  { printf '    %s\n' "$*"; }
-ok()    { printf '    %s✓%s %s\n' "$C_GREEN" "$C_RESET" "$*"; }
-skip()  { printf '    %s-%s %s\n' "$C_DIM" "$C_RESET" "$*"; }
-warn()  { printf '    %s!%s %s\n' "$C_YELLOW" "$C_RESET" "$*"; }
-fail()  { printf '    %s✗%s %s\n' "$C_RED" "$C_RESET" "$*"; }
-die()   { printf '\n%s오류:%s %s\n' "$C_RED" "$C_RESET" "$*" >&2; exit 1; }
-
-has() { command -v "$1" >/dev/null 2>&1; }
-
-# --dry-run 이면 명령을 출력만 하고 실행하지 않는다.
-run() {
-  if $DRY_RUN; then
-    printf '    %s[dry-run]%s %s\n' "$C_DIM" "$C_RESET" "$*"
-  else
-    "$@"
-  fi
-}
 
 # 원격 설치 스크립트를 내려받아 실행한다.
 # run() 에 넘기면 명령 치환이 먼저 평가돼 dry-run 에서도 네트워크를 타므로 따로 둔다.
@@ -82,7 +53,7 @@ ITEMS=(
   "antigravity|Antigravity|Google Antigravity CLI"
   "sdkman|SDKMAN|JVM 툴체인 매니저"
   "font|Fonts|JetBrainsMono + D2Coding (Nerd Font 아이콘 포함)"
-  "dotfiles|dotfiles 링크|이 저장소의 설정 파일을 홈에 심볼릭 링크"
+  "dotfiles|dotfiles 링크|applications/ 의 설정 파일을 홈에 심볼릭 링크"
   "shell|기본 셸을 zsh 로|chsh 로 로그인 셸 변경"
   "macos|macOS 기본 설정|키 반복 속도, Finder, Dock, 스크린샷 위치"
 )
@@ -226,10 +197,11 @@ tui_select() {
 
 # ------------------------------------------------------------- 심볼릭 링크 --
 
-# link <레포 안 경로> <설치될 경로>
+# link <applications/ 안 경로> <설치될 경로>
 # 원본이 없으면 건너뛰고, 기존 파일이 있으면 백업한 뒤 링크한다.
+# 이 레포를 가리키던 옛 링크(경로 이동 등으로 깨진 것 포함)는 백업 없이 교체한다.
 link() {
-  local src="$DOTFILES_DIR/$1" dst="$2"
+  local src="$APPS_DIR/$1" dst="$2" cur
 
   if [[ ! -e "$src" ]]; then
     skip "$1 ${C_DIM}(레포에 아직 파일 없음)${C_RESET}"
@@ -241,7 +213,13 @@ link() {
     return 0
   fi
 
-  if [[ -e "$dst" || -L "$dst" ]]; then
+  cur=""
+  [[ -L "$dst" ]] && cur="$(readlink "$dst")"
+
+  if [[ "$cur" == "$DOTFILES_DIR/"* ]]; then
+    info "옛 링크 교체: $dst ${C_DIM}(was ${cur#"$DOTFILES_DIR"/})${C_RESET}"
+    run rm -f "$dst"
+  elif [[ -e "$dst" || -L "$dst" ]]; then
     warn "기존 파일 백업: $dst -> $dst.$BACKUP_SUFFIX"
     run mv "$dst" "$dst.$BACKUP_SUFFIX"
   fi
@@ -330,7 +308,7 @@ require_brew() {
 install_brewfile() {
   require_brew || return 1
 
-  local brewfile="$DOTFILES_DIR/setup/macos/Brewfile"
+  local brewfile="$APPS_DIR/homebrew/Brewfile"
   [[ -f "$brewfile" ]] || { warn "Brewfile 없음: $brewfile"; return 1; }
 
   info "Brewfile: $brewfile"
@@ -363,7 +341,7 @@ install_ohmyzsh() {
     sh "" --unattended || return 1
   ok "설치 완료"
 
-  if [[ -f "$DOTFILES_DIR/shell/.zshrc" ]]; then
+  if [[ -f "$APPS_DIR/shell/.zshrc" ]]; then
     warn "Oh My Zsh 가 만든 ~/.zshrc 는 dotfiles 링크 단계에서 백업 후 교체됩니다."
   fi
 }
@@ -445,12 +423,12 @@ install_sdkman() {
   ok "설치 완료 (새 셸에서 'sdk version' 으로 확인)"
 }
 
-# 폰트는 macOS/Linux 공용이라 font/install.sh 에 로직을 두고 여기서는 위임만 한다.
+# 폰트는 macOS/Linux 공용이라 scripts/lib/font.sh 에 로직을 두고 여기서는 위임만 한다.
 install_font() {
-  local script="$DOTFILES_DIR/font/install.sh"
+  local script="$SCRIPTS_DIR/lib/font.sh"
 
   if [[ ! -f "$script" ]]; then
-    warn "font/install.sh 가 없습니다: $script"
+    warn "scripts/lib/font.sh 가 없습니다: $script"
     return 1
   fi
 
@@ -480,9 +458,9 @@ install_dotfiles() {
   local editor list ext
   for editor in code cursor; do
     if [[ "$editor" == "code" ]]; then
-      list="$DOTFILES_DIR/vscode/extensions.txt"
+      list="$APPS_DIR/vscode/extensions.txt"
     else
-      list="$DOTFILES_DIR/cursor/extensions.txt"
+      list="$APPS_DIR/cursor/extensions.txt"
     fi
 
     [[ -f "$list" ]] || { skip "$editor ${C_DIM}(extensions.txt 없음)${C_RESET}"; continue; }
@@ -594,7 +572,7 @@ print_list() {
   printf '  --only 로 항목을 직접 지정할 수 있습니다. 예) --only homebrew,node,claude\n\n'
 }
 
-usage() { sed -n '2,15p' "${BASH_SOURCE[0]}" | sed 's/^#\{0,1\} \{0,1\}//'; }
+usage() { usage_from "${BASH_SOURCE[0]}" 15; }
 
 main() {
   while (($#)); do
