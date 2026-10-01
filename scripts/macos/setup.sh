@@ -15,6 +15,8 @@ set -uo pipefail
 
 # shellcheck source=../lib/common.sh
 source "$(dirname "${BASH_SOURCE[0]}")/../lib/common.sh"
+# shellcheck source=../lib/ui.sh
+source "$SCRIPTS_DIR/lib/ui.sh"
 
 BACKUP_SUFFIX="bak.$(date +%Y%m%d%H%M%S)"
 BREW_PREFIX=""
@@ -124,76 +126,32 @@ select_only_keys() {
 
 # -------------------------------------------------------------------- TUI --
 
-tui_restore() { printf '\033[?25h\033[?1049l'; }
-
-tui_render() {
-  local cursor="$1" i mark label state line
-  printf '\033[H\033[2J'
-  printf '%s macOS 초기 세팅 %s\n\n' "$C_BOLD$C_REV" "$C_RESET"
-  printf '  %s↑/↓%s 이동   %s space%s 선택   %s a%s 전체   %s n%s 해제   %s enter%s 설치   %s q%s 취소\n\n' \
-    "$C_CYAN" "$C_RESET" "$C_CYAN" "$C_RESET" "$C_CYAN" "$C_RESET" \
-    "$C_CYAN" "$C_RESET" "$C_CYAN" "$C_RESET" "$C_CYAN" "$C_RESET"
-
-  for ((i = 0; i < ${#ITEM_KEYS[@]}; i++)); do
-    if [[ "${SELECTED[$i]}" == "1" ]]; then
-      mark="${C_GREEN}[x]${C_RESET}"
-    else
-      mark="[ ]"
-    fi
-
-    state=""
-    item_installed "${ITEM_KEYS[$i]}" && state=" ${C_DIM}(이미 설치됨)${C_RESET}"
-
-    label="${ITEM_LABELS[$i]}"
-    if ((i == cursor)); then
-      line=$(printf ' %s▸%s %s %s%s%s%s' "$C_CYAN" "$C_RESET" "$mark" "$C_BOLD" "$label" "$C_RESET" "$state")
-    else
-      line=$(printf '   %s %s%s' "$mark" "$label" "$state")
-    fi
-    printf '%s\n' "$line"
-  done
-
-  printf '\n  %s%s%s\n' "$C_DIM" "${ITEM_DESCS[$cursor]}" "$C_RESET"
+# 체크리스트에 보일 한 줄. ui_choose_multi 는 쉼표를 구분자로 쓰므로 설명의 쉼표는 바꾼다.
+item_display() {
+  local i="$1" desc state=""
+  desc="${ITEM_DESCS[$i]//, / · }"
+  item_installed "${ITEM_KEYS[$i]}" && state="  [설치됨]"
+  printf '%s — %s%s\n' "${ITEM_LABELS[$i]}" "$desc" "$state"
 }
 
-tui_select() {
-  local cursor=0 n=${#ITEM_KEYS[@]} key rest i
+# 체크리스트에서 고른 결과를 SELECTED 에 반영한다. 취소하면 1 을 반환한다.
+select_interactive() {
+  local i displays=() preselected="" picked
 
-  printf '\033[?1049h\033[?25l'
-  trap 'tui_restore' EXIT INT TERM
-
-  while :; do
-    tui_render "$cursor"
-
-    IFS= read -rsn1 key </dev/tty || { tui_restore; trap - EXIT INT TERM; return 1; }
-
-    # 방향키는 ESC [ A 형태의 3바이트 시퀀스로 들어온다.
-    if [[ "$key" == $'\033' ]]; then
-      IFS= read -rsn2 rest </dev/tty
-      key="$key$rest"
-    fi
-
-    case "$key" in
-      # 끝에서 반대쪽 끝으로 순환. ((cursor++)) 는 증가 전 값(0)을 결과로 돌려줘
-      # && / || 체인에서 거짓으로 취급되므로 쓰지 않는다.
-      $'\033[A'|k) cursor=$(( (cursor - 1 + n) % n )) ;;
-      $'\033[B'|j) cursor=$(( (cursor + 1) % n )) ;;
-      ' ')
-        if [[ "${SELECTED[$cursor]}" == "1" ]]; then
-          SELECTED[$cursor]=0
-        else
-          SELECTED[$cursor]=1
-        fi ;;
-      a|A) for ((i = 0; i < n; i++)); do SELECTED[$i]=1; done ;;
-      n|N) for ((i = 0; i < n; i++)); do SELECTED[$i]=0; done ;;
-      q|Q) tui_restore; trap - EXIT INT TERM; return 1 ;;
-      # Enter 는 터미널 설정에 따라 빈 문자열/\n/\r 중 하나로 들어온다.
-      ''|$'\n'|$'\r') break ;;
-    esac
+  for ((i = 0; i < ${#ITEM_KEYS[@]}; i++)); do
+    displays[$i]="$(item_display "$i")"
+    [[ "${SELECTED[$i]}" == "1" ]] && preselected="$preselected${displays[$i]}"$'\n'
   done
 
-  tui_restore
-  trap - EXIT INT TERM
+  ui_gum_notice
+  printf '\033[H\033[2J' >/dev/tty
+  ui_title "macOS 초기 세팅" "설치할 항목을 고르세요 · 설치된 항목은 기본 해제"
+  picked="$(ui_choose_multi "설치 항목" "$preselected" "${displays[@]}")" || return 1
+
+  for ((i = 0; i < ${#ITEM_KEYS[@]}; i++)); do
+    SELECTED[$i]=0
+    printf '%s\n' "$picked" | grep -qxF "${displays[$i]}" && SELECTED[$i]=1
+  done
   return 0
 }
 
@@ -605,7 +563,7 @@ main() {
     init_selection
     # TUI 는 /dev/tty 를 직접 읽는다. 파일이 있어도 열리지 않는 환경이 있어 열기까지 확인한다.
     if [[ -t 1 ]] && (exec 3</dev/tty) 2>/dev/null; then
-      tui_select || { printf '\n취소했습니다.\n'; exit 0; }
+      select_interactive || { printf '\n취소했습니다.\n'; exit 0; }
     else
       die "대화형 터미널이 아닙니다. --all 또는 --only 를 사용하세요."
     fi
@@ -616,6 +574,11 @@ main() {
     [[ "${SELECTED[$i]}" == "1" ]] && ((count++))
   done
   ((count > 0)) || { printf '\n선택한 항목이 없습니다.\n'; exit 0; }
+
+  # 체크리스트로 골랐을 때만 한 번 더 확인한다. (--all / --only 는 바로 진행)
+  if [[ -z "$ONLY_KEYS" ]] && ! $ASSUME_YES && ! $DRY_RUN; then
+    ui_confirm "$count 개 항목을 설치할까요?" || { printf '\n취소했습니다.\n'; exit 0; }
+  fi
 
   printf '\n%s%d개 항목을 설치합니다.%s\n' "$C_BOLD" "$count" "$C_RESET"
   info "dotfiles: $DOTFILES_DIR"
