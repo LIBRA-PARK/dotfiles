@@ -8,6 +8,9 @@
 # Ghostty 내장 Nord 테마 (목록 확인: ghostty +list-themes)
 # 라이트/다크 자동 전환을 원하면: theme = light:rose-pine-dawn,dark:Nord
 theme = Nord
+# themes/setting.sh 로 고른 테마가 있으면 위 기본값을 덮어쓴다 (없으면 무시)
+# config-file 은 본 파일을 다 읽은 뒤 처리되므로 위치와 관계없이 우선한다.
+config-file = ?~/.config/ghostty/theme.conf
 
 # ── 폰트 ─────────────────────────────────────────────────────────
 # 목록 확인: ghostty +list-fonts
