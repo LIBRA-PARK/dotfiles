@@ -174,8 +174,10 @@ tui_select() {
     fi
 
     case "$key" in
-      $'\033[A'|k) ((cursor > 0)) && ((cursor--)) || cursor=$((n - 1)) ;;
-      $'\033[B'|j) ((cursor < n - 1)) && ((cursor++)) || cursor=0 ;;
+      # 끝에서 반대쪽 끝으로 순환. ((cursor++)) 는 증가 전 값(0)을 결과로 돌려줘
+      # && / || 체인에서 거짓으로 취급되므로 쓰지 않는다.
+      $'\033[A'|k) cursor=$(( (cursor - 1 + n) % n )) ;;
+      $'\033[B'|j) cursor=$(( (cursor + 1) % n )) ;;
       ' ')
         if [[ "${SELECTED[$cursor]}" == "1" ]]; then
           SELECTED[$cursor]=0
