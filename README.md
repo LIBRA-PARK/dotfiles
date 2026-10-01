@@ -11,6 +11,7 @@ dotfiles/
 ├── cursor/    # Cursor 에디터 설정 (settings.json, keybindings.json 등)
 ├── vscode/    # VS Code 설정 (settings.json, keybindings.json, extensions 목록 등)
 ├── ghostty/   # Ghostty 터미널 설정 (config)
+├── claude/    # Claude Code 설정 (statusline.sh)
 ├── git/       # Git 설정 (.gitconfig, .gitignore_global 등)
 ├── font/      # 코딩 폰트 (JetBrains Mono + D2Coding, Nerd Font 패치본)
 │   ├── jetbrains-mono/  # 기본 폰트
@@ -38,6 +39,7 @@ ln -s ~/dotfiles/ghostty/config ~/.config/ghostty/config
 | Cursor  | `~/Library/Application Support/Cursor/User/`        | `~/.config/Cursor/User/`        |
 | VS Code | `~/Library/Application Support/Code/User/`          | `~/.config/Code/User/`          |
 | Ghostty | `~/.config/ghostty/config`                          | `~/.config/ghostty/config`      |
+| Claude Code | `~/.claude/statusline-command.sh`               | `~/.claude/statusline-command.sh` |
 | Git     | `~/.gitconfig`                                      | `~/.gitconfig`                  |
 | Shell   | `~/.zshrc`, `~/.bashrc`                             | `~/.zshrc`, `~/.bashrc`         |
 | SDKMAN  | `<project>/.sdkmanrc`                               | `<project>/.sdkmanrc`           |

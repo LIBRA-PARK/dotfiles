@@ -471,6 +471,7 @@ install_dotfiles() {
   link "shell/.zprofile"         "$HOME/.zprofile"
   link "shell/aliases.zsh"       "$HOME/.config/zsh/aliases.zsh"
   link "ghostty/config"          "$HOME/.config/ghostty/config"
+  link "claude/statusline.sh"    "$HOME/.claude/statusline-command.sh"
   link "cursor/settings.json"    "$app_support/Cursor/User/settings.json"
   link "cursor/keybindings.json" "$app_support/Cursor/User/keybindings.json"
   link "vscode/settings.json"    "$app_support/Code/User/settings.json"
