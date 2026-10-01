@@ -5,11 +5,11 @@
   // 설정 변경은 저장 즉시 적용된다.
 
   // ── 테마 ───────────────────────────────────────────────────────
-  // Ghostty 와 같은 Nord 테마. 확장 설치가 필요하다: applications/cursor/extensions.txt
-  // (arcticicestudio.nord-visual-studio-code)
+  // 아래 값은 테마 스크립트가 바꾼다: bash scripts/dotfiles.sh theme <테마>
+  // 테마 값과 필요한 확장은 themes/cursor/ 참고 (적용할 때 확장도 함께 설치된다)
   // 라이트/다크 자동 전환을 원하면 아래 두 줄과 함께 preferredDark/LightColorTheme 을 지정:
   //   "window.autoDetectColorScheme": true,
-  "workbench.colorTheme": "Nord",
+  "workbench.colorTheme": "Tokyo Night Light",
 
   // ── 폰트 ───────────────────────────────────────────────────────
   // 레포 폰트 정책(assets/fonts/fonts.conf, scripts/lib/font.sh)과 동일한 fallback 체인을 쓴다.
