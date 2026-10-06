@@ -225,7 +225,7 @@ bash scripts/dotfiles.sh setup --only node,claude  # 특정 항목만 설치
 | `codex`       | Codex                    | `npm install -g @openai/codex`                    |
 | `herdr`       | Herdr                    | herdr.dev 설치 스크립트                           |
 | `antigravity` | Antigravity              | Google Antigravity CLI                            |
-| `sdkman`      | SDKMAN                   | JVM 툴체인 매니저                                 |
+| `sdkman`      | SDKMAN                   | JVM 툴체인 매니저 (bash 4 이상이 없으면 Homebrew 로 먼저 설치) |
 | `font`        | Fonts                    | JetBrains Mono + D2Coding (Nerd Font 아이콘 포함) |
 | `dotfiles`    | dotfiles 링크            | `applications/` 심볼릭 링크 + 에디터 확장 설치    |
 | `shell`       | 기본 셸                  | `chsh` 로 zsh 전환                                |

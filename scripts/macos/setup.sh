@@ -374,12 +374,36 @@ install_antigravity() {
   ok "설치 완료"
 }
 
+# bash 4 이상인 실행 파일 경로를 출력한다. 없으면 1.
+# macOS 기본 /bin/bash 는 3.2 라서 Homebrew 로 설치한 bash 를 먼저 찾는다.
+modern_bash() {
+  local candidate
+  for candidate in /opt/homebrew/bin/bash /usr/local/bin/bash "$(command -v bash)"; do
+    [[ -x "$candidate" ]] || continue
+    # shellcheck disable=SC2016  # 후보 bash 안에서 펼쳐져야 하는 변수다
+    if "$candidate" -c '((BASH_VERSINFO[0] >= 4))' 2>/dev/null; then
+      printf '%s\n' "$candidate"
+      return 0
+    fi
+  done
+  return 1
+}
+
 install_sdkman() {
   if [[ -d "$HOME/.sdkman" ]]; then
     skip "이미 설치됨"
     return 0
   fi
-  run_remote_script "https://get.sdkman.io" "SDKMAN 설치 스크립트 실행" || return 1
+
+  # SDKMAN 설치 스크립트는 bash 4 이상을 요구하고, 3.2 로 돌리면 바로 종료한다.
+  local shell
+  if ! shell="$(modern_bash)"; then
+    info "bash 4 이상이 없어 Homebrew 로 설치합니다. (SDKMAN 설치 스크립트 요구 사항)"
+    require_brew || return 1
+    run brew install bash || return 1
+    shell="$(modern_bash)" || $DRY_RUN || { warn "bash 4 이상을 찾지 못했습니다."; return 1; }
+  fi
+  run_remote_script "https://get.sdkman.io" "SDKMAN 설치 스크립트 실행" "${shell:-bash}" || return 1
   ok "설치 완료 (새 셸에서 'sdk version' 으로 확인)"
 }
 

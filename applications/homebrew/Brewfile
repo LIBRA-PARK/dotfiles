@@ -7,9 +7,8 @@
 #   brew bundle check --file applications/homebrew/Brewfile    # 설치 여부 확인
 #   brew bundle dump --file applications/homebrew/Brewfile     # 현재 머신 상태로 덮어쓰기
 
-tap "homebrew/bundle"
-
 # --- 기본 ---
+brew "bash"         # macOS 기본 bash 는 3.2. SDKMAN 설치 스크립트가 4 이상을 요구한다
 brew "git"
 brew "gh"
 brew "curl"
