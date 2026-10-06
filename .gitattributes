@@ -1,3 +1,9 @@
+# 텍스트 파일은 어느 OS 에서 clone 하든 LF 로 체크아웃한다.
+# Windows 의 core.autocrlf 가 CRLF 로 바꾸면 셸 스크립트가 깨지고(\r 이 명령에 붙는다),
+# 링크된 settings.json 에 내용 변화 없는 diff 가 생긴다.
+# 아래의 더 구체적인 규칙(binary, -text)이 이 줄보다 우선한다.
+* text=auto eol=lf
+
 # 폰트는 바이너리. git 이 diff 를 시도하거나 개행을 변환하지 않도록 명시한다.
 *.ttf binary
 *.otf binary

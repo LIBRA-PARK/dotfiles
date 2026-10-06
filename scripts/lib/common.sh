@@ -5,7 +5,7 @@
 #   source "$(dirname "${BASH_SOURCE[0]}")/../lib/common.sh"
 #
 # 제공: DOTFILES_DIR, 색상(C_*), 출력 함수(step/info/ok/skip/warn/fail/die),
-#       has, run(DRY_RUN 존중)
+#       has, run(DRY_RUN 존중), app_config_dir
 #
 # macOS 기본 bash 3.2 에서 동작하도록 연관배열/mapfile 등은 쓰지 않는다.
 
@@ -50,6 +50,24 @@ run() {
   else
     "$@"
   fi
+}
+
+# 앱 설정이 모이는 OS 별 루트 디렉토리.
+#   macOS   ~/Library/Application Support
+#   Windows %APPDATA% (Git Bash 경로로 변환. 예: /c/Users/<이름>/AppData/Roaming)
+#   Linux   ${XDG_CONFIG_HOME:-~/.config}
+# VS Code 계열 에디터는 이 아래 <앱>/User/ 에 settings.json 을 둔다.
+app_config_dir() {
+  case "$(uname -s)" in
+    Darwin) printf '%s\n' "$HOME/Library/Application Support" ;;
+    MINGW*|MSYS*|CYGWIN*)
+      if [[ -n "${APPDATA:-}" ]] && has cygpath; then
+        cygpath -u "$APPDATA"
+      else
+        printf '%s\n' "$HOME/AppData/Roaming"
+      fi ;;
+    *) printf '%s\n' "${XDG_CONFIG_HOME:-$HOME/.config}" ;;
+  esac
 }
 
 # 스크립트 상단 주석(2번째 줄부터 지정한 줄까지)을 도움말로 출력한다.

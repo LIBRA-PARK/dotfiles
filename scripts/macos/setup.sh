@@ -410,10 +410,11 @@ install_dotfiles() {
   link "shell/aliases.zsh"       "$HOME/.config/zsh/aliases.zsh"
   link "ghostty/config"          "$HOME/.config/ghostty/config"
   link "claude/statusline.sh"    "$HOME/.claude/statusline-command.sh"
-  link "cursor/settings.json"    "$app_support/Cursor/User/settings.json"
-  link "cursor/keybindings.json" "$app_support/Cursor/User/keybindings.json"
-  link "vscode/settings.json"    "$app_support/Code/User/settings.json"
-  link "vscode/keybindings.json" "$app_support/Code/User/keybindings.json"
+  # keybindings 는 OS 마다 수식키가 달라(macOS cmd ↔ Windows ctrl) 파일을 따로 둔다.
+  link "cursor/settings.json"          "$app_support/Cursor/User/settings.json"
+  link "cursor/keybindings.macos.json" "$app_support/Cursor/User/keybindings.json"
+  link "vscode/settings.json"          "$app_support/Code/User/settings.json"
+  link "vscode/keybindings.macos.json" "$app_support/Code/User/keybindings.json"
 
   local editor list ext
   for editor in code cursor; do

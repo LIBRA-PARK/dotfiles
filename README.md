@@ -13,8 +13,8 @@
 dotfiles/
 ├── applications/   # 앱별 설정 파일 (홈에 심볼릭 링크되는 원본)
 │   ├── claude/       # Claude Code statusline
-│   ├── cursor/       # Cursor settings.json, extensions.txt
-│   ├── vscode/       # VS Code settings.json, extensions.txt
+│   ├── cursor/       # Cursor settings.json, keybindings.<os>.json, extensions.txt
+│   ├── vscode/       # VS Code settings.json, keybindings.<os>.json, extensions.txt
 │   ├── ghostty/      # Ghostty config
 │   ├── git/          # .gitconfig, .gitignore_global
 │   ├── shell/        # .zshrc, .zprofile, aliases
@@ -27,6 +27,7 @@ dotfiles/
     ├── dotfiles.sh   # 단일 진입점 (TUI 메뉴)
     ├── lib/          # 공용 헬퍼(common.sh), TUI(ui.sh), OS 무관 작업 (font, theme, themes-index)
     ├── macos/        # macOS 초기 세팅 (setup.sh)
+    ├── windows/      # Windows 초기 세팅 (setup.sh, Git Bash 에서 실행)
     └── linux/        # Linux 초기 세팅 (예정)
 ```
 
@@ -62,16 +63,19 @@ gum 이 없으면 경고와 함께 현재 OS 에 맞는 설치 방법을 보여 
 
 `applications/` 의 설정 파일은 초기 세팅의 `dotfiles` 항목이 원래 위치에 심볼릭 링크합니다.
 
-| Tool        | 설정 파일 위치 (macOS)                       | 설정 파일 위치 (Linux)            |
-| ----------- | -------------------------------------------- | --------------------------------- |
-| Cursor      | `~/Library/Application Support/Cursor/User/` | `~/.config/Cursor/User/`          |
-| VS Code     | `~/Library/Application Support/Code/User/`   | `~/.config/Code/User/`            |
-| Ghostty     | `~/.config/ghostty/config`                   | `~/.config/ghostty/config`        |
-| Claude Code | `~/.claude/statusline-command.sh`            | `~/.claude/statusline-command.sh` |
-| Git         | `~/.gitconfig`                               | `~/.gitconfig`                    |
-| Shell       | `~/.zshrc`, `~/.bashrc`                      | `~/.zshrc`, `~/.bashrc`           |
-| SDKMAN      | `<project>/.sdkmanrc`                        | `<project>/.sdkmanrc`             |
-| Fonts       | `~/Library/Fonts/`                           | `~/.local/share/fonts/`           |
+| Tool        | 설정 파일 위치 (macOS)                       | 설정 파일 위치 (Linux)            | 설정 파일 위치 (Windows)   |
+| ----------- | -------------------------------------------- | --------------------------------- | -------------------------- |
+| Cursor      | `~/Library/Application Support/Cursor/User/` | `~/.config/Cursor/User/`          | `%APPDATA%\Cursor\User\`   |
+| VS Code     | `~/Library/Application Support/Code/User/`   | `~/.config/Code/User/`            | `%APPDATA%\Code\User\`     |
+| Ghostty     | `~/.config/ghostty/config`                   | `~/.config/ghostty/config`        | —                          |
+| Claude Code | `~/.claude/statusline-command.sh`            | `~/.claude/statusline-command.sh` | —                          |
+| Git         | `~/.gitconfig`                               | `~/.gitconfig`                    | `%USERPROFILE%\.gitconfig` |
+| Shell       | `~/.zshrc`, `~/.bashrc`                      | `~/.zshrc`, `~/.bashrc`           | —                          |
+| SDKMAN      | `<project>/.sdkmanrc`                        | `<project>/.sdkmanrc`             | —                          |
+| Fonts       | `~/Library/Fonts/`                           | `~/.local/share/fonts/`           | 수동 설치                  |
+
+`—` 는 초기 세팅 스크립트가 아직 링크하지 않는 항목입니다.
+Cursor / VS Code 의 OS 별 위치는 `scripts/lib/common.sh` 의 `app_config_dir` 이 정합니다.
 
 ### Fonts
 
@@ -157,7 +161,7 @@ cd ~/work/<project> && sdk env
 
 ### Setup
 
-새 머신의 초기 세팅 위저드는 OS 별로 `scripts/<macos|linux>/setup.sh` 에 있습니다.
+새 머신의 초기 세팅은 OS 별로 `scripts/<macos|windows|linux>/setup.sh` 에 있습니다.
 `dotfiles.sh setup` 이 현재 OS 를 감지해 맞는 스크립트를 실행합니다.
 
 ```bash
@@ -202,6 +206,38 @@ bash scripts/dotfiles.sh setup --only node,claude  # 특정 항목만 설치
 설치할 CLI 패키지는 [`applications/homebrew/Brewfile`](./applications/homebrew/Brewfile) 을 직접 수정해 관리합니다.
 
 > macOS 기본 `/bin/bash` 는 3.2 이므로 스크립트는 bash 3.2 문법만 사용합니다.
+
+#### Windows
+
+Windows 는 체크리스트 없이 **설정 파일 링크와 에디터 확장 설치**만 합니다. Git Bash 에서 실행합니다.
+
+1. **개발자 모드 켜기** — 설정 → 시스템 → 개발자용 → 개발자 모드.
+   관리자 권한 없이 심볼릭 링크를 만들 수 있게 됩니다. (또는 Git Bash 를 관리자 권한으로 실행)
+2. **Git for Windows, Cursor / VS Code 설치** — 에디터 설치 화면의 "PATH 에 추가" 를 켜 둡니다.
+3. **Git Bash 에서 실행**
+
+```bash
+git clone git@github.com:LIBRA-PARK/dotfiles.git ~/dotfiles
+bash ~/dotfiles/scripts/dotfiles.sh setup --list      # 링크 대상과 현재 상태만 확인
+bash ~/dotfiles/scripts/dotfiles.sh setup --dry-run   # 변경 없이 실행 내용만 출력
+bash ~/dotfiles/scripts/dotfiles.sh setup             # 링크 + 확장 설치
+```
+
+Git Bash 의 `ln -s` 는 기본 동작이 복사라서, 스크립트가 `MSYS=winsymlinks:nativestrict` 로
+진짜 심볼릭 링크를 만들게 합니다. 권한이 없으면 복사로 넘어가지 않고 실패합니다.
+복사본은 `git pull` 을 따라가지 않기 때문입니다.
+
+#### OS 간 동기화
+
+한쪽에서 `git commit` / `git push`, 다른 쪽에서 `git pull` 하면 링크를 통해 바로 반영됩니다.
+
+- **줄바꿈** — `.gitattributes` 가 텍스트 파일을 어느 OS 에서든 LF 로 체크아웃합니다.
+- **settings.json** — OS 와 무관한 값만 둡니다. JDK 경로 같은 절대 경로는 넣지 않고
+  기기마다 `JAVA_HOME` 으로 맞춥니다. `terminal.integrated.defaultProfile.osx` / `.windows`
+  처럼 OS 접미사가 붙은 키는 한 파일에 같이 둬도 됩니다.
+- **keybindings** — 수식키가 OS 마다 달라 `keybindings.macos.json` / `keybindings.windows.json`
+  으로 나눕니다. 각 OS 의 setup 이 맞는 파일을 `keybindings.json` 으로 링크합니다.
+- **확장** — 설치하거나 지운 뒤 `cursor --list-extensions` 로 `extensions.txt` 를 갱신합니다.
 
 ## License
 

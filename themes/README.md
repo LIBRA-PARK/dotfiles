@@ -65,7 +65,7 @@ themes/
 | `THEME_EXT`    | 테마 파일 확장자                                    |
 | `PLATFORM`     | 적용 가능한 OS (`macos`, `linux`, `windows` 공백 구분) |
 | `APPLY_METHOD` | 적용 방식 (아래 표)                                 |
-| `TARGET`       | 적용 대상 파일 경로                                 |
+| `TARGET`       | 적용 대상 파일 경로. OS 마다 다르면 `$(app_config_dir)` 로 시작 |
 | `JSON_PATH`    | `merge-json` 일 때 병합할 위치 (jq 경로)            |
 | `NOTE`         | 적용 후 안내 문구                                   |
 | `PROCESS`      | 이 프로세스가 떠 있으면 건너뜀 (`pgrep -f` 정규식, `--force` 로 무시) |
