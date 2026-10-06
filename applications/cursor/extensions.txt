@@ -4,3 +4,7 @@ arcticicestudio.nord-visual-studio-code
 enkia.tokyo-night
 # Java: 언어 서버(redhat.java), 디버거, 테스트 러너, Maven, Gradle, 프로젝트 관리자를 묶은 팩
 vscjava.vscode-java-pack
+# 원격: SSH 로 원격 서버의 폴더를 열어 작업 (Cursor 공식 확장. 접속 정보는 ~/.ssh/config)
+anysphere.remote-ssh
+# 원격: SFTP/FTP 로 파일 업로드·다운로드·동기화 (접속 정보는 프로젝트의 .vscode/sftp.json)
+natizyskunk.sftp
