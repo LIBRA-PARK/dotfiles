@@ -2,3 +2,5 @@
 # 현재 설치 목록 갱신: cursor --list-extensions > applications/cursor/extensions.txt
 arcticicestudio.nord-visual-studio-code
 enkia.tokyo-night
+# Java: 언어 서버(redhat.java), 디버거, 테스트 러너, Maven, Gradle, 프로젝트 관리자를 묶은 팩
+vscjava.vscode-java-pack

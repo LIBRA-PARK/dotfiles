@@ -1,7 +1,9 @@
 {
   // Cursor 설정 (VS Code 와 같은 settings.json 형식. 주석 사용 가능)
-  // 설치 위치: ~/Library/Application Support/Cursor/User/settings.json
-  //   (scripts/macos/setup.sh 의 dotfiles 항목이 심볼릭 링크)
+  // 설치 위치: macOS   ~/Library/Application Support/Cursor/User/settings.json
+  //            Windows %APPDATA%\Cursor\User\settings.json
+  //   (scripts/<os>/setup.sh 가 심볼릭 링크)
+  // macOS 와 Windows 가 같이 쓰는 파일이므로 OS 에 묶인 절대 경로는 넣지 않는다.
   // 설정 변경은 저장 즉시 적용된다.
 
   // ── 테마 ───────────────────────────────────────────────────────
@@ -30,5 +32,17 @@
   "explorer.compactFolders": false,
   "scm.compactFolders": false,
   "notebook.compactView": false,
-  "git.confirmSync": false
+  "git.confirmSync": false,
+
+  // ── Java (Maven / Gradle) ──────────────────────────────────────
+  // 확장: vscjava.vscode-java-pack (applications/cursor/extensions.txt)
+  // JDK 경로(java.jdt.ls.java.home, java.configuration.runtimes)는 기기마다 달라 여기에 두지 않는다.
+  // 각 기기에서 JAVA_HOME 만 맞추면 확장이 찾는다. 프로젝트별 값은 <project>/.vscode/settings.json 에 둔다.
+  // pom.xml / build.gradle 이 바뀌면 묻지 않고 프로젝트 설정을 다시 읽는다.
+  "java.configuration.updateBuildConfiguration": "automatic",
+  // 프로젝트에 Wrapper(./mvnw, ./gradlew)가 있으면 시스템에 설치된 것보다 먼저 쓴다.
+  "maven.executable.preferMavenWrapper": true,
+  "java.import.gradle.wrapper.enabled": true,
+  // Maven 의존성의 소스 jar 도 받아 정의로 이동했을 때 원본 코드를 보여 준다.
+  "java.maven.downloadSources": true
 }
