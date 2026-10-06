@@ -7,6 +7,8 @@
 #   ui_choose_multi <헤더> <기본선택> <항목>... 여러 개 고르기 → 고른 항목들을 줄 단위로 stdout
 #                                               (기본선택: 항목을 줄바꿈으로 이은 문자열)
 #   ui_confirm  <질문>                          예/아니오       → 종료코드 0/1
+#   ui_input    <질문> [기본값] [예시]          한 줄 입력      → 입력값을 stdout
+#   ui_spin     <안내문> <출력 파일> <명령>...  명령이 도는 동안 스피너 → 명령의 종료코드
 #   ui_pause    [안내문]                        아무 키 대기
 #
 # gum(https://github.com/charmbracelet/gum)이 있으면 gum 으로 그리고,
@@ -115,6 +117,11 @@ if use_gum; then
   export GUM_CONFIRM_PROMPT_FOREGROUND="$UI_TEXT"
   export GUM_CONFIRM_SELECTED_BACKGROUND="$UI_BORDER"
   export GUM_CONFIRM_SELECTED_FOREGROUND="#2E3440"
+  export GUM_INPUT_HEADER_FOREGROUND="$UI_TEXT"
+  export GUM_INPUT_PROMPT_FOREGROUND="$UI_ACCENT"
+  export GUM_INPUT_CURSOR_FOREGROUND="$UI_ACCENT"
+  export GUM_SPIN_SPINNER_FOREGROUND="$UI_ACCENT"
+  export GUM_SPIN_TITLE_FOREGROUND="$UI_MUTED"
 fi
 
 # ------------------------------------------------------------------- 제목 --
@@ -275,4 +282,33 @@ ui_pause() {
   fi
   IFS= read -rsn1 _ </dev/tty
   printf '\n' >/dev/tty
+}
+
+# ------------------------------------------------------------ 입력 / 스피너 --
+
+# 기본값이 있으면 입력 칸에 미리 채워 둔다. 취소하면 1 을 반환한다.
+ui_input() {
+  local q="$1" def="${2:-}" hint="${3:-}" ans
+  if use_gum; then
+    gum input --header "$q" --prompt "▸ " --value "$def" --placeholder "$hint"
+    return $?
+  fi
+  printf '  %s%s%s' "$C_BOLD" "$q" "$C_RESET" >/dev/tty
+  [[ -n "$def" ]]  && printf ' %s[%s]%s' "$C_DIM" "$def" "$C_RESET" >/dev/tty
+  [[ -z "$def" && -n "$hint" ]] && printf ' %s(예: %s)%s' "$C_DIM" "$hint" "$C_RESET" >/dev/tty
+  printf ' ' >/dev/tty
+  IFS= read -r ans </dev/tty || return 1
+  printf '%s\n' "${ans:-$def}"
+}
+
+# 명령의 stdout/stderr 는 화면에 내지 않고 출력 파일에 담는다. 실패 원인은 호출한 쪽이 그 파일에서 읽는다.
+# 명령은 별도 프로세스로 돌기 때문에 셸 함수는 넘길 수 없다.
+ui_spin() {
+  local title="$1" out="$2"; shift 2
+  if use_gum && [[ -t 2 ]]; then
+    gum spin --spinner dot --title "$title" -- bash -c '"$@" >"$0" 2>&1' "$out" "$@"
+    return $?
+  fi
+  printf '    %s%s%s\n' "$C_DIM" "$title" "$C_RESET" >&2
+  "$@" >"$out" 2>&1
 }

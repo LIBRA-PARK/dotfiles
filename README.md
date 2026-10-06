@@ -25,7 +25,7 @@ dotfiles/
 ├── themes/         # 앱별 테마 값 (themes/README.md 참고)
 └── scripts/        # 실행 스크립트
     ├── dotfiles.sh   # 단일 진입점 (TUI 메뉴)
-    ├── lib/          # 공용 헬퍼(common.sh), TUI(ui.sh), OS 무관 작업 (font, theme, themes-index)
+    ├── lib/          # 공용 헬퍼(common.sh), TUI(ui.sh), OS 무관 작업 (font, theme, themes-index, ssh)
     ├── macos/        # macOS 초기 세팅 (setup.sh)
     ├── windows/      # Windows 초기 세팅 (setup.sh, Git Bash 에서 실행)
     └── linux/        # Linux 초기 세팅 (예정)
@@ -42,6 +42,7 @@ bash ~/dotfiles/scripts/dotfiles.sh setup [옵션]     # OS 별 초기 세팅
 bash ~/dotfiles/scripts/dotfiles.sh font [옵션]      # 폰트 설치/확인
 bash ~/dotfiles/scripts/dotfiles.sh theme [테마]     # 테마 적용 (themes/README.md 참고)
 bash ~/dotfiles/scripts/dotfiles.sh themes-index     # themes/README.md 인덱스 갱신
+bash ~/dotfiles/scripts/dotfiles.sh ssh [명령]       # SSH 호스트 등록, 헬스체크, SFTP 설정
 ```
 
 메뉴에서 고른 작업이 끝나면 메뉴로 돌아옵니다. 옵션은 하위 스크립트에 그대로 넘어가고,
@@ -145,6 +146,38 @@ font-size = 14
 ```bash
 cd ~/dotfiles/assets/fonts && sha256sum -c SHA256SUMS   # 커밋된 파일 무결성 확인
 ```
+
+### SSH / SFTP
+
+서버 접속 정보를 손으로 적는 대신 `scripts/lib/ssh.sh` 가 묻고, **실제로 연결되는지 확인한 뒤에만** 저장합니다.
+macOS, Linux, Windows(Git Bash)에서 같은 명령을 씁니다.
+
+```bash
+bash ~/dotfiles/scripts/dotfiles.sh ssh                  # 메뉴
+bash ~/dotfiles/scripts/dotfiles.sh ssh add              # 호스트 등록
+bash ~/dotfiles/scripts/dotfiles.sh ssh list             # 등록된 호스트 목록
+bash ~/dotfiles/scripts/dotfiles.sh ssh check [호스트]   # 헬스체크 (--all 은 전부)
+bash ~/dotfiles/scripts/dotfiles.sh ssh sftp [호스트]    # <프로젝트>/.vscode/sftp.json 생성
+```
+
+`-n`/`--dry-run` 은 설정 파일을 쓰지 않고(연결 확인은 실제로 합니다), `-y`/`--yes` 는 확인 질문을 건너뜁니다.
+`add` 는 `--name --host --user --port --key`, `sftp` 는 `--dir --remote` 로 값을 미리 줄 수 있습니다.
+
+헬스체크는 세 단계로 나뉘어 어디서 막혔는지 보여 줍니다.
+
+| 단계        | 확인하는 것                              | 실패했을 때 볼 곳                  |
+| ----------- | ---------------------------------------- | ---------------------------------- |
+| 서버 응답   | 주소·포트에서 SSH 서버가 응답하는지      | 주소, 포트, 방화벽, VPN            |
+| SSH 인증    | 키로 로그인되는지                        | 서버의 `~/.ssh/authorized_keys`    |
+| SFTP        | SFTP 가 열리는지 (`sftp` 는 서버 경로까지) | 서버의 `Subsystem sftp` 설정       |
+
+- **`add`** — 처음 보는 서버면 호스트 키 지문을 보여 주고 신뢰할지 묻습니다. 키가 서버에 없으면
+  공개 키를 등록합니다(이때만 서버 비밀번호가 필요하고, `ssh` 가 직접 묻습니다).
+  세 단계를 통과하면 `~/.ssh/config` 끝에 `Host` 블록을 덧붙입니다. 기존 내용은 건드리지 않고 먼저 백업합니다.
+- **`sftp`** — [natizyskunk.sftp](https://open-vsx.org/extension/Natizyskunk/sftp) 확장이 읽는 설정 파일을 만듭니다.
+  서버 경로에 실제로 들어갈 수 있는지 확인한 뒤 쓰고, git 저장소 안이면 `.gitignore` 에 추가할지 묻습니다.
+- **비밀번호는 받거나 저장하지 않습니다.** 접속 정보도 이 레포가 아니라 `~/.ssh/config` 와
+  각 프로젝트의 `.vscode/sftp.json` 에만 남습니다.
 
 ### SDKMAN
 

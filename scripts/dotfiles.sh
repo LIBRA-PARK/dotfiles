@@ -7,6 +7,7 @@
 #   bash scripts/dotfiles.sh font [옵션]         # 폰트 설치/확인 (scripts/lib/font.sh)
 #   bash scripts/dotfiles.sh theme [테마] [옵션] # 테마 적용 (scripts/lib/theme.sh)
 #   bash scripts/dotfiles.sh themes-index [옵션] # themes/README.md 인덱스 갱신
+#   bash scripts/dotfiles.sh ssh [명령] [옵션]   # SSH 호스트 등록, 헬스체크, SFTP 설정 (scripts/lib/ssh.sh)
 #
 # 옵션은 하위 스크립트에 그대로 넘긴다. 예) dotfiles.sh setup --dry-run
 # 각 하위 스크립트는 단독으로 실행해도 동작한다.
@@ -38,6 +39,7 @@ script_for() {
     font)         printf '%s\n' "$SCRIPTS_DIR/lib/font.sh" ;;
     theme)        printf '%s\n' "$SCRIPTS_DIR/lib/theme.sh" ;;
     themes-index) printf '%s\n' "$SCRIPTS_DIR/lib/themes-index.sh" ;;
+    ssh)          printf '%s\n' "$SCRIPTS_DIR/lib/ssh.sh" ;;
     *)            return 1 ;;
   esac
 }
@@ -66,6 +68,9 @@ MENU=(
   "테마 적용|theme|"
   "테마 지원 현황|theme|--list"
   "테마 인덱스 갱신|themes-index|"
+  "SSH 호스트 등록|ssh|add"
+  "SSH / SFTP 연결 확인|ssh|check"
+  "SFTP 설정 만들기|ssh|sftp"
 )
 MENU_QUIT="종료"
 
@@ -97,7 +102,7 @@ run_menu() {
 
 main() {
   case "${1:-}" in
-    -h|--help) usage_from "${BASH_SOURCE[0]}" 14; exit 0 ;;
+    -h|--help) usage_from "${BASH_SOURCE[0]}" 15; exit 0 ;;
     "")
       if [[ -t 1 ]] && (exec 3</dev/tty) 2>/dev/null; then
         run_menu
