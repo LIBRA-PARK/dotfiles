@@ -1,0 +1,13 @@
+// Cursor 키 바인딩 (Windows). 주석 사용 가능
+// 설치 위치: %APPDATA%\Cursor\User\keybindings.json
+//   (scripts/windows/setup.sh 가 심볼릭 링크)
+// 수식키가 OS 마다 달라 macOS 는 keybindings.macos.json 에 따로 둔다.
+// 변경은 저장 즉시 적용된다.
+[
+  // ── 사이드바 ──────────────────────────────────────────────────
+  // 기본값인 줄 내어쓰기/들여쓰기(ctrl+[ / ctrl+])를 덮어쓴다. 들여쓰기는 tab / shift+tab 을 쓴다.
+  // 메인 사이드바 보이기/숨기기 (기본 ctrl+b)
+  { "key": "ctrl+[", "command": "workbench.action.toggleSidebarVisibility" },
+  // 보조 사이드바(Cursor 에서는 AI 채팅 창) 보이기/숨기기 (기본 ctrl+alt+b)
+  { "key": "ctrl+]", "command": "workbench.action.toggleAuxiliaryBar" }
+]

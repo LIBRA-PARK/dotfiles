@@ -35,6 +35,8 @@
   "scm.compactFolders": false,
   "notebook.compactView": false,
   "git.confirmSync": false,
+  // 액티비티 바를 왼쪽 세로로 고정한다. 가로(기본)면 Gradle 등 확장 아이콘이 … 안으로 숨는다.
+  "workbench.activityBar.orientation": "vertical",
 
   // ── Java (Maven / Gradle) ──────────────────────────────────────
   // 확장: vscjava.vscode-java-pack (applications/cursor/extensions.txt)
