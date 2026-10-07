@@ -5,7 +5,7 @@
 #   source "$(dirname "${BASH_SOURCE[0]}")/../lib/common.sh"
 #
 # 제공: DOTFILES_DIR, 색상(C_*), 출력 함수(step/info/ok/skip/warn/fail/die),
-#       has, run(DRY_RUN 존중), app_config_dir
+#       has, run(DRY_RUN 존중), jq_install_hint, wsl_notice, app_config_dir
 #
 # macOS 기본 bash 3.2 에서 동작하도록 연관배열/mapfile 등은 쓰지 않는다.
 
@@ -51,6 +51,36 @@ run() {
     "$@"
   fi
 }
+
+# jq 가 없을 때 보여 줄 OS 별 설치 방법.
+jq_install_hint() {
+  case "$(uname -s)" in
+    Darwin)               printf 'brew install jq\n' ;;
+    MINGW*|MSYS*|CYGWIN*) printf 'winget install jqlang.jq (설치 후 Git Bash 를 새로 여세요)\n' ;;
+    *)                    printf '패키지 매니저로 jq 설치 (예: sudo apt install jq)\n' ;;
+  esac
+}
+
+# WSL 안에서 Windows 드라이브(/mnt/c 등)에 있는 레포를 실행했는지.
+# PowerShell / cmd 의 bash 는 Git Bash 가 아니라 WSL 이라, Windows 에서 그대로 치면 이 경우가 된다.
+is_wsl_on_windows_drive() {
+  [[ "$DOTFILES_DIR" == /mnt/[a-z]/* ]] || return 1
+  [[ -n "${WSL_DISTRO_NAME:-}" ]] || grep -qi microsoft /proc/sys/kernel/osrelease 2>/dev/null
+}
+
+# 위 경우에는 Linux 로 동작해 Windows 가 아니라 WSL 홈에 적용된다. 모르고 지나가지 않게 한 번 알린다.
+# 하위 스크립트로 넘어가도 다시 뜨지 않도록 환경변수로 한 번만 표시한다.
+wsl_notice() {
+  is_wsl_on_windows_drive || return 0
+  [[ -n "${DOTFILES_WSL_NOTICE_SHOWN:-}" ]] && return 0
+  export DOTFILES_WSL_NOTICE_SHOWN=1
+  {
+    warn "WSL 에서 실행 중입니다. Linux 로 동작하며 Windows 가 아니라 WSL 홈($HOME)에 적용됩니다."
+    info "Windows 에 적용하려면 Git Bash 로 실행하세요. PowerShell / cmd 의 bash 는 WSL 입니다."
+    info '  & "C:\Program Files\Git\bin\bash.exe" scripts/dotfiles.sh'
+  } >&2
+}
+wsl_notice
 
 # 앱 설정이 모이는 OS 별 루트 디렉토리.
 #   macOS   ~/Library/Application Support

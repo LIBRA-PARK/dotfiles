@@ -80,6 +80,8 @@ run_menu() {
   os="$(os_dir 2>/dev/null || uname -s)"
 
   ui_gum_notice
+  # WSL 안내(common.sh 의 wsl_notice)가 아래 화면 지우기에 바로 사라지지 않게 멈춘다.
+  is_wsl_on_windows_drive && ui_pause "계속하려면 아무 키나 누르세요..."
 
   # 하위 스크립트(setup 의 체크리스트 등)가 끝나면 메뉴로 돌아온다.
   while :; do

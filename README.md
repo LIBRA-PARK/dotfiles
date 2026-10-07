@@ -242,7 +242,12 @@ bash scripts/dotfiles.sh setup --only node,claude  # 특정 항목만 설치
 
 #### Windows
 
-Windows 는 체크리스트 없이 **설정 파일 링크와 에디터 확장 설치**만 합니다. Git Bash 에서 실행합니다.
+Windows 는 체크리스트 없이 **설정 파일 링크와 에디터 확장 설치**만 하고, 테마 적용에 필요한 `jq` 가
+있는지 확인합니다 (없으면 `winget install jqlang.jq`). Git Bash 에서 실행합니다.
+
+> PowerShell / cmd 의 `bash` 는 Git Bash 가 아니라 WSL 입니다. 거기서 실행하면 Linux 로 동작해
+> WSL 홈에 적용되므로 스크립트가 경고를 띄웁니다. PowerShell 에서 꼭 실행해야 하면
+> `& "C:\Program Files\Git\bin\bash.exe" scripts/dotfiles.sh` 처럼 Git Bash 를 직접 지정합니다.
 
 1. **개발자 모드 켜기** — 설정 → 시스템 → 개발자용 → 개발자 모드.
    관리자 권한 없이 심볼릭 링크를 만들 수 있게 됩니다. (또는 Git Bash 를 관리자 권한으로 실행)

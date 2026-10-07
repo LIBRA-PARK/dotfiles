@@ -105,7 +105,7 @@ apply_link() {
 
 apply_merge_json() {
   local file="$1" tmp rc
-  has jq || { warn "jq 가 필요합니다."; return 1; }
+  has jq || { warn "jq 가 필요합니다. 설치: $(jq_install_hint)"; return 1; }
   [[ -f "$TARGET" ]] || { skip "대상 파일 없음 (앱을 한 번 실행한 뒤 다시 시도): $TARGET"; return 2; }
 
   tmp="$(mktemp)"
@@ -160,7 +160,7 @@ jsonc_upsert() {
 
 apply_merge_jsonc() {
   local file="$1" tmp key val rc
-  has jq || { warn "jq 가 필요합니다."; return 1; }
+  has jq || { warn "jq 가 필요합니다. 설치: $(jq_install_hint)"; return 1; }
   [[ -f "$TARGET" ]] || { skip "대상 파일 없음 (앱 미설치?): $TARGET"; return 2; }
 
   tmp="$(mktemp)"

@@ -2,7 +2,7 @@
 #
 # Windows 초기 세팅 (Git Bash 에서 실행)
 #
-#   bash scripts/windows/setup.sh               # 설정 파일 링크 + 에디터 확장 설치
+#   bash scripts/windows/setup.sh               # 설정 파일 링크 + 에디터 확장 설치 + 도구 확인
 #   bash scripts/windows/setup.sh --dry-run     # 실제 변경 없이 실행 내용만 출력
 #   bash scripts/windows/setup.sh --list        # 링크 대상과 현재 상태만 확인
 #
@@ -106,28 +106,70 @@ install_links() {
 
 # ------------------------------------------------------------- 에디터 확장 --
 
+# 확장 하나를 설치한다. 에디터 CLI 의 출력(진행 문구, Node 경고)은 숨기고 실패했을 때만 원인을 보여 준다.
+# install_extension <에디터 CLI> <확장 ID> <이미 설치된 확장 목록>
+install_extension() {
+  local editor="$1" ext="$2" installed="$3" log
+  if printf '%s\n' "$installed" | grep -qixF -- "$ext"; then
+    skip "$ext ${C_DIM}(이미 설치됨)${C_RESET}"
+    return 0
+  fi
+  if $DRY_RUN; then
+    run "$editor" --install-extension "$ext" --force
+    return 0
+  fi
+
+  log="$(mktemp)" || return 1
+  if "$editor" --install-extension "$ext" --force >"$log" 2>&1; then
+    ok "$ext"
+    rm -f "$log"
+    return 0
+  fi
+  fail "$ext ${C_DIM}($(grep -v -e '^[[:space:]]*$' -e 'DeprecationWarning' -e 'trace-deprecation' "$log" | tail -n 1))${C_RESET}"
+  rm -f "$log"
+  return 1
+}
+
 install_extensions() {
-  local editor list ext
+  local editor app list ext installed rc=0
   for editor in code cursor; do
     if [[ "$editor" == "code" ]]; then
-      list="$APPS_DIR/vscode/extensions.txt"
+      app="Code";   list="$APPS_DIR/vscode/extensions.txt"
     else
-      list="$APPS_DIR/cursor/extensions.txt"
+      app="Cursor"; list="$APPS_DIR/cursor/extensions.txt"
     fi
 
     [[ -f "$list" ]] || { skip "$editor ${C_DIM}(extensions.txt 없음)${C_RESET}"; continue; }
     if ! has "$editor"; then
-      warn "$editor CLI 없음. 에디터를 설치할 때 'PATH 에 추가' 를 켜고 Git Bash 를 다시 여세요."
+      # 설정 폴더가 있으면 에디터는 깔려 있고 CLI 만 PATH 에 없는 것이다.
+      if [[ -d "$(app_config_dir)/$app" ]]; then
+        warn "$editor CLI 없음. 에디터를 설치할 때 'PATH 에 추가' 를 켜고 Git Bash 를 다시 여세요."
+      else
+        skip "$editor ${C_DIM}(설치 안 됨, 건너뜀)${C_RESET}"
+      fi
       continue
     fi
 
+    info "$editor"
+    installed="$("$editor" --list-extensions 2>/dev/null | tr -d '\r')"
     while read -r ext; do
       ext="${ext%$'\r'}"   # CRLF 로 체크아웃된 경우 대비
       [[ -n "$ext" && "$ext" != \#* ]] || continue
-      run "$editor" --install-extension "$ext" --force
+      install_extension "$editor" "$ext" "$installed" || rc=1
     done <"$list"
-    ok "$editor 확장 설치 완료"
   done
+  return $rc
+}
+
+# --------------------------------------------------------------- 도구 확인 --
+
+# 다른 작업(theme 등)이 쓰는 CLI 가 있는지 본다. 설치하지는 않고 방법만 알린다.
+check_tools() {
+  if has jq; then
+    ok "jq"
+  else
+    warn "jq 없음. 테마 적용(theme)에 필요합니다. 설치: $(jq_install_hint)"
+  fi
 }
 
 # -------------------------------------------------------------------- main --
@@ -173,10 +215,12 @@ main() {
   $DRY_RUN && warn "dry-run 모드: 실제로 아무것도 변경하지 않습니다."
 
   local failed=false
-  step "[1/2] dotfiles 링크"
+  step "[1/3] dotfiles 링크"
   install_links || failed=true
-  step "[2/2] 에디터 확장"
+  step "[2/3] 에디터 확장"
   install_extensions || failed=true
+  step "[3/3] 도구 확인"
+  check_tools
 
   if $failed; then
     printf '\n'

@@ -70,6 +70,14 @@ valid_host() { [[ "$1" =~ ^[A-Za-z0-9][A-Za-z0-9.:_-]*$ ]]; }
 valid_user() { [[ "$1" =~ ^[A-Za-z0-9_][A-Za-z0-9._@-]*$ ]]; }
 valid_port() { [[ "$1" =~ ^[0-9]+$ ]] && ((10#$1 >= 1 && 10#$1 <= 65535)); }
 
+# 사용자 기본값으로 제안할 로컬 계정 이름. 서버 계정으로 쓸 수 없는 모양이면 비운다.
+# (Windows 의 Entra 계정은 "AzureAD+홍길동(Hong)" 처럼 나와 valid_user 를 통과하지 못한다)
+default_user() {
+  local u
+  u="$(id -un 2>/dev/null)" && valid_user "$u" && printf '%s\n' "$u"
+  return 0
+}
+
 # ask <변수 설명> <옵션 이름> <현재 값> <기본값> <예시> <검사 함수>
 # 값이 비어 있으면 물어보고, 검사를 통과할 때까지 다시 묻는다. 결과는 stdout.
 ask() {
@@ -428,8 +436,8 @@ cmd_add() {
   host_exists "$name" && die "이미 등록된 별칭입니다: $name ($(tilde_path "$SSH_CONFIG"))"
   host="$(ask "서버 주소" --host "$host" "" "203.0.113.10 또는 example.com" valid_host)" || return 1
   # 터미널이 없으면 물어볼 수 없으니 기본값을 쓴다.
-  if ! has_tty; then user="${user:-$(id -un)}"; port="${port:-22}"; fi
-  user="$(ask "사용자" --user "$user" "$(id -un)" "" valid_user)" || return 1
+  if ! has_tty; then user="${user:-$(default_user)}"; port="${port:-22}"; fi
+  user="$(ask "사용자" --user "$user" "$(default_user)" "" valid_user)" || return 1
   port="$(ask "포트" --port "$port" "22" "" valid_port)" || return 1
 
   step "[1/4] 서버 응답"
