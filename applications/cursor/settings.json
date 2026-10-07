@@ -12,6 +12,8 @@
   // 라이트/다크 자동 전환을 원하면 아래 두 줄과 함께 preferredDark/LightColorTheme 을 지정:
   //   "window.autoDetectColorScheme": true,
   "workbench.colorTheme": "Nord",
+  // 파일·폴더 아이콘 테마. 확장: pkief.material-icon-theme (applications/cursor/extensions.txt)
+  "workbench.iconTheme": "material-icon-theme",
 
   // ── 폰트 ───────────────────────────────────────────────────────
   // 레포 폰트 정책(assets/fonts/fonts.conf, scripts/lib/font.sh)과 동일한 fallback 체인을 쓴다.
