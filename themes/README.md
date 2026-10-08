@@ -13,13 +13,13 @@ bash scripts/dotfiles.sh theme --list                       # 테마 x 앱 지�
 
 <!-- INDEX:START -->
 
-| 앱 | 적용 방식 | nord | tokyo-night-light |
-| --- | --- | :---: | :---: |
-| [Cursor](https://github.com/LIBRA-PARK/dotfiles/blob/main/themes/cursor/app.conf) | `merge-jsonc` | [✓](https://github.com/LIBRA-PARK/dotfiles/blob/main/themes/cursor/nord.json) | [✓](https://github.com/LIBRA-PARK/dotfiles/blob/main/themes/cursor/tokyo-night-light.json) |
-| [Ghostty](https://github.com/LIBRA-PARK/dotfiles/blob/main/themes/ghostty/app.conf) | `link` | [✓](https://github.com/LIBRA-PARK/dotfiles/blob/main/themes/ghostty/nord.conf) | [✓](https://github.com/LIBRA-PARK/dotfiles/blob/main/themes/ghostty/tokyo-night-light.conf) |
-| [MobaXterm](https://github.com/LIBRA-PARK/dotfiles/blob/main/themes/mobaxterm/app.conf) | `manual` | [✓](https://github.com/LIBRA-PARK/dotfiles/blob/main/themes/mobaxterm/nord.mxtcolors) | [✓](https://github.com/LIBRA-PARK/dotfiles/blob/main/themes/mobaxterm/tokyo-night-light.mxtcolors) |
-| [Orca](https://github.com/LIBRA-PARK/dotfiles/blob/main/themes/orca/app.conf) | `merge-json` | [✓](https://github.com/LIBRA-PARK/dotfiles/blob/main/themes/orca/nord.json) | [✓](https://github.com/LIBRA-PARK/dotfiles/blob/main/themes/orca/tokyo-night-light.json) |
-| [VS Code](https://github.com/LIBRA-PARK/dotfiles/blob/main/themes/vscode/app.conf) | `merge-jsonc` | [✓](https://github.com/LIBRA-PARK/dotfiles/blob/main/themes/vscode/nord.json) | [✓](https://github.com/LIBRA-PARK/dotfiles/blob/main/themes/vscode/tokyo-night-light.json) |
+| 앱 | 적용 방식 | nord | one-dark-pro | tokyo-night-light |
+| --- | --- | :---: | :---: | :---: |
+| [Cursor](https://github.com/LIBRA-PARK/dotfiles/blob/main/themes/cursor/app.conf) | `merge-jsonc` | [✓](https://github.com/LIBRA-PARK/dotfiles/blob/main/themes/cursor/nord.json) | [✓](https://github.com/LIBRA-PARK/dotfiles/blob/main/themes/cursor/one-dark-pro.json) | [✓](https://github.com/LIBRA-PARK/dotfiles/blob/main/themes/cursor/tokyo-night-light.json) |
+| [Ghostty](https://github.com/LIBRA-PARK/dotfiles/blob/main/themes/ghostty/app.conf) | `link` | [✓](https://github.com/LIBRA-PARK/dotfiles/blob/main/themes/ghostty/nord.conf) | [✓](https://github.com/LIBRA-PARK/dotfiles/blob/main/themes/ghostty/one-dark-pro.conf) | [✓](https://github.com/LIBRA-PARK/dotfiles/blob/main/themes/ghostty/tokyo-night-light.conf) |
+| [MobaXterm](https://github.com/LIBRA-PARK/dotfiles/blob/main/themes/mobaxterm/app.conf) | `manual` | [✓](https://github.com/LIBRA-PARK/dotfiles/blob/main/themes/mobaxterm/nord.mxtcolors) | [✓](https://github.com/LIBRA-PARK/dotfiles/blob/main/themes/mobaxterm/one-dark-pro.mxtcolors) | [✓](https://github.com/LIBRA-PARK/dotfiles/blob/main/themes/mobaxterm/tokyo-night-light.mxtcolors) |
+| [Orca](https://github.com/LIBRA-PARK/dotfiles/blob/main/themes/orca/app.conf) | `merge-json` | [✓](https://github.com/LIBRA-PARK/dotfiles/blob/main/themes/orca/nord.json) | [✓](https://github.com/LIBRA-PARK/dotfiles/blob/main/themes/orca/one-dark-pro.json) | [✓](https://github.com/LIBRA-PARK/dotfiles/blob/main/themes/orca/tokyo-night-light.json) |
+| [VS Code](https://github.com/LIBRA-PARK/dotfiles/blob/main/themes/vscode/app.conf) | `merge-jsonc` | [✓](https://github.com/LIBRA-PARK/dotfiles/blob/main/themes/vscode/nord.json) | [✓](https://github.com/LIBRA-PARK/dotfiles/blob/main/themes/vscode/one-dark-pro.json) | [✓](https://github.com/LIBRA-PARK/dotfiles/blob/main/themes/vscode/tokyo-night-light.json) |
 
 앱 이름을 누르면 적용 정보(app.conf), ✓ 를 누르면 테마 파일로 이동합니다. — 는 아직 없는 조합입니다.
 
@@ -93,6 +93,7 @@ themes/
   없어 로컬 파일에만 병합됩니다. 테마 확장은 `applications/vscode/extensions.txt` 에 등록합니다.
 - **Orca** — `orca-data.json` 은 Orca 가 실행 중에 덮어쓰므로 **완전히 종료한 뒤**
   적용해야 합니다. 실행 중이면 자동으로 건너뜁니다. 값은 Orca 내장 터미널 테마 이름입니다.
+  내장 목록에 One Dark Pro 는 없어 `one-dark-pro` 는 가장 가까운 One Dark 를 씁니다.
 - **MobaXterm** — Windows 전용. `MobaXterm.ini` 의 `[Colors]` 섹션을 교체합니다.
 
 ## 추가하기

@@ -2,3 +2,4 @@
 # 현재 설치 목록 갱신: code --list-extensions > applications/vscode/extensions.txt
 arcticicestudio.nord-visual-studio-code
 enkia.tokyo-night
+zhuangtongfa.material-theme
