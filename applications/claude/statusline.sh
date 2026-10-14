@@ -5,8 +5,8 @@
 
 input=$(cat)
 
-# jq 한 번 호출로 필요한 값을 모두 추출 (탭 구분)
-IFS=$'\t' read -r cwd model used_pct dur_ms five_h seven_d < <(
+# jq 한 번 호출로 필요한 값을 모두 추출 (US 문자 구분; 탭은 빈 필드가 합쳐져 값이 밀림)
+IFS=$'\x1f' read -r cwd model used_pct dur_ms five_h seven_d < <(
   echo "$input" | jq -r '[
     (.workspace.current_dir // .cwd // ""),
     (.model.display_name // ""),
@@ -14,7 +14,7 @@ IFS=$'\t' read -r cwd model used_pct dur_ms five_h seven_d < <(
     (.cost.total_duration_ms // ""),
     (.rate_limits.five_hour.used_percentage // ""),
     (.rate_limits.seven_day.used_percentage // "")
-  ] | map(tostring) | join("\t")'
+  ] | map(tostring) | join("\u001f")'
 )
 
 # Nerd Font 아이콘 (UTF-8 바이트; bash 3.2 호환을 위해 \u 대신 \x 사용)

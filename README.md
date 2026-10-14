@@ -97,10 +97,11 @@ Cursor / VS Code 의 OS 별 위치는 `scripts/lib/common.sh` 의 `app_config_di
 > 설정에는 `D2KodingLigature Nerd Font` 를 그대로 쓰세요.
 
 ```bash
-bash ~/dotfiles/scripts/dotfiles.sh font              # 홈 폰트 디렉토리로 심볼릭 링크
+bash ~/dotfiles/scripts/dotfiles.sh font              # 홈 폰트 디렉토리로 설치 (macOS: 복사, Linux: 심볼릭 링크)
 bash ~/dotfiles/scripts/dotfiles.sh font --list       # 현재 설치 상태 확인
 bash ~/dotfiles/scripts/dotfiles.sh font --dry-run    # 변경 없이 실행 내용만 출력
 bash ~/dotfiles/scripts/dotfiles.sh font --copy       # 링크 대신 복사
+bash ~/dotfiles/scripts/dotfiles.sh font --link       # 복사 대신 심볼릭 링크 (macOS 는 폰트를 인식하지 못할 수 있음)
 bash ~/dotfiles/scripts/dotfiles.sh font --uninstall  # 이 스크립트가 설치한 것만 제거
 ```
 

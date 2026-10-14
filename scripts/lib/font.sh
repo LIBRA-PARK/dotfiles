@@ -2,8 +2,9 @@
 #
 # 폰트 설치 (macOS / Linux)
 #
-#   bash scripts/lib/font.sh              # 홈 폰트 디렉토리로 심볼릭 링크
+#   bash scripts/lib/font.sh              # 홈 폰트 디렉토리로 설치 (macOS: 복사, Linux: 심볼릭 링크)
 #   bash scripts/lib/font.sh --copy       # 링크 대신 복사 (링크를 못 읽는 앱이 있을 때)
+#   bash scripts/lib/font.sh --link       # 복사 대신 심볼릭 링크 (macOS 에서도 링크를 강제)
 #   bash scripts/lib/font.sh --dry-run    # 실제 변경 없이 실행 내용만 출력
 #   bash scripts/lib/font.sh --list       # 레포의 폰트와 현재 설치 상태만 확인
 #   bash scripts/lib/font.sh --uninstall  # 이 스크립트가 설치한 것만 제거
@@ -23,7 +24,13 @@ FONT_DIR="$ASSETS_DIR/fonts"
 
 LIST_ONLY=false
 UNINSTALL=false
-USE_COPY=false
+# macOS 는 ~/Library/Fonts 의 심볼릭 링크 폰트를 등록하지 않으므로 기본을 복사로 둔다.
+# (특히 링크 대상이 ~/Documents 처럼 보호된 폴더면 fontd 가 읽지 못해 앱에서 폰트가 안 보인다)
+if [[ "$(uname -s)" == "Darwin" ]]; then
+  USE_COPY=true
+else
+  USE_COPY=false
+fi
 
 # fontconfig 설정이 링크될 이름. conf.d 는 파일명 순으로 읽히므로 숫자 접두사를 둔다.
 FONTCONF_NAME="10-dotfiles-fonts.conf"
@@ -61,6 +68,10 @@ link_font() {
     if [[ -f "$dst" && ! -L "$dst" ]] && cmp -s "$src" "$dst"; then
       skip "$(basename "$src") ${C_DIM}(이미 동일)${C_RESET}"
       return 0
+    fi
+    # 기존 심볼릭 링크는 cp 가 링크를 따라가 원본과 동일 파일로 판단하므로 먼저 지운다.
+    if [[ -L "$dst" ]]; then
+      run rm -f "$dst" || return 1
     fi
     run cp -f "$src" "$dst" || return 1
     ok "$(basename "$src") ${C_DIM}(복사)${C_RESET}"
@@ -245,7 +256,7 @@ EOF
 
 # -------------------------------------------------------------------- main --
 
-usage() { usage_from "${BASH_SOURCE[0]}" 16; }
+usage() { usage_from "${BASH_SOURCE[0]}" 17; }
 
 main() {
   while (($#)); do
@@ -254,6 +265,7 @@ main() {
       -l|--list)      LIST_ONLY=true ;;
       -u|--uninstall) UNINSTALL=true ;;
       -c|--copy)      USE_COPY=true ;;
+      --link)         USE_COPY=false ;;
       -h|--help)      usage; exit 0 ;;
       *)              die "알 수 없는 옵션: $1" ;;
     esac
